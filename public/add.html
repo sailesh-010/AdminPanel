@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jha System - Retail Dashboard</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js for the graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+
+        .sidebar-link {
+            transition: all 0.2s;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background: linear-gradient(90deg, #E53935 0%, #EF5350 100%);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(229, 57, 53, 0.3);
+            transform: translateX(4px);
+        }
+        .sidebar-link:hover i, .sidebar-link.active i {
+            color: white;
+        }
+
+        /* Animation for cards */
+        .stat-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen overflow-hidden flex">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col h-full shadow-xl lg:shadow-none">
+        
+        <!-- Logo -->
+        <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+                <div class="bg-[#E53935] text-white h-10 w-10 flex items-center justify-center rounded-lg font-bold text-2xl shadow-md">सा</div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800 tracking-tight">Jha System</h1>
+                    <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">"साझा समाधान, सजिलो व्यापार"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Main Menu</p>
+            
+            <a href="/dashboard" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-house w-5 text-center transition-colors"></i> Dashboard
+            </a>
+            <a href="/sale" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-cart-shopping w-5 text-center text-gray-400 transition-colors"></i> Sale
+            </a>
+            <a href="#" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-boxes-stacked w-5 text-center text-gray-400 transition-colors"></i> Stocks
+            </a>
+            <a href="/add-product" onclick="setActive(this)" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-border-all w-5 text-center text-gray-400 transition-colors"></i> Add Items
+            </a>
+            
+            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">Finance & People</p>
+            
+            <a href="/bill" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-file-invoice w-5 text-center text-gray-400 transition-colors"></i> Create Bill
+            </a>
+            <a href="/bills" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-list w-5 text-center text-gray-400 transition-colors"></i> Bills History
+            </a>
+            <a href="#" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-chart-simple w-5 text-center text-gray-400 transition-colors"></i> Revenue
+            </a>
+            <a href="#" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-user-group w-5 text-center text-gray-400 transition-colors"></i> Workers
+            </a>
+        </nav>
+
+        <!-- Bottom Actions -->
+        <div class="p-4 border-t border-gray-100">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl font-medium transition duration-200">
+                <i class="fa-solid fa-gear w-5 text-center"></i> Settings
+            </a>
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl font-medium transition duration-200">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Log Out
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col min-w-0 h-full">
+        
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-8 z-10">
+            <!-- Left: Mobile Menu & Search -->
+            <div class="flex items-center gap-4 flex-1">
+                <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-red-500 p-1">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                
+                <div class="relative w-full max-w-md hidden sm:block">
+                    <span class="absolute left-3 top-2.5 text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" placeholder="Search items, bills, or customers..." class="w-full bg-gray-100 hover:bg-gray-50 focus:bg-white border border-transparent focus:border-red-200 rounded-lg py-2 pl-10 pr-4 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-100">
+                </div>
+            </div>
+
+            <!-- Right: Notifications & Profile -->
+            <div class="flex items-center gap-4 lg:gap-6">
+                <button class="relative text-gray-400 hover:text-red-500 transition p-2 rounded-full hover:bg-gray-50">
+                    <i class="fa-regular fa-bell text-xl"></i>
+                    <span class="absolute top-1.5 right-2 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                </button>
+                
+                <div class="h-8 w-px bg-gray-200 hidden sm:block"></div>
+                
+                <div class="flex items-center gap-3 cursor-pointer p-1 rounded-lg hover:bg-gray-50 transition">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-gray-800 leading-none">Admin User</p>
+                        <p class="text-[10px] text-gray-500 font-medium uppercase mt-1">Store Manager</p>
+                    </div>
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-red-100 to-red-200 text-red-600 border border-red-200 flex items-center justify-center font-bold shadow-sm">
+                        AU
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Dashboard Area -->
+        <div class="flex-1 overflow-y-auto p-4 lg:p-8">
+            
+            <!-- Dashboard Title & Action -->
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+                <div>
+                    <h2 class="text-2xl font-bold text-gray-900">Add New Product</h2>
+                    <p class="text-gray-500 text-sm mt-1">Add a new product to your inventory.</p>
+                </div>
+                <div class="flex gap-2 items-center">
+                    <label class="text-sm font-semibold text-gray-700">Add Multiple Products:</label>
+                    <div class="flex gap-2">
+                        <button onclick="setProductCount(1)" class="productCountBtn active px-4 py-2 bg-red-500 text-white rounded-lg font-medium transition hover:bg-red-600" data-count="1">1</button>
+                        <button onclick="setProductCount(2)" class="productCountBtn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium transition hover:bg-gray-300" data-count="2">2</button>
+                        <button onclick="setProductCount(3)" class="productCountBtn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium transition hover:bg-gray-300" data-count="3">3</button>
+                        <button onclick="setProductCount(5)" class="productCountBtn px-4 py-2 bg-gray-200 text-gray-700 rounded-lg font-medium transition hover:bg-gray-300" data-count="5">5</button>
+                        <div class="flex items-center gap-2">
+                            <input type="number" id="customProductCount" min="1" max="20" value="1" placeholder="Custom" class="w-16 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500">
+                            <button onclick="setCustomProductCount()" class="px-3 py-2 bg-blue-500 text-white rounded-lg font-medium transition hover:bg-blue-600"><i class="fa-solid fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Products Container -->
+            <div id="productsContainer" class="space-y-6">
+                <!-- Add Product Form Card -->
+                <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 max-w-2xl">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold text-gray-900">Product #<span class="productNumber">1</span></h3>
+                        <span class="text-xs bg-red-100 text-red-700 px-3 py-1 rounded-full font-medium">Form 1</span>
+                    </div>
+                    <form class="addProductForm space-y-6">
+                        
+                        <!-- Product Name -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Product Name <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                type="text" 
+                                class="productName w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                                name="productName" 
+                                placeholder="Enter product name"
+                                required
+                            >
+                        </div>
+
+                        <!-- Product Category -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Category Type <span class="text-red-500">*</span>
+                            </label>
+                            <select 
+                                class="productCategory w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition bg-white"
+                                name="productCategory" 
+                                required
+                            >
+                                <option value="">Loading categories...</option>
+                            </select>
+                        </div>
+
+                        <!-- Product Price -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Product Price (₹) <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                type="number" 
+                                class="productPrice w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                                name="productPrice" 
+                                placeholder="Enter price"
+                                step="0.01"
+                                min="0"
+                                required
+                            >
+                        </div>
+
+                        <!-- Size Range -->
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Minimum Size <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="number" 
+                                    class="sizeMin w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                                    name="sizeMin" 
+                                    placeholder="Min size"
+                                    step="0.1"
+                                    min="0"
+                                    required
+                                >
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                    Maximum Size <span class="text-red-500">*</span>
+                                </label>
+                                <input 
+                                    type="number" 
+                                    class="sizeMax w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                                    name="sizeMax" 
+                                    placeholder="Max size"
+                                    step="0.1"
+                                    min="0"
+                                    required
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Number of Sets -->
+                        <div>
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">
+                                Number of Sets <span class="text-red-500">*</span>
+                            </label>
+                            <input 
+                                type="number" 
+                                class="productQuantity w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                                name="productQuantity" 
+                                placeholder="Enter quantity of sets"
+                                min="1"
+                                step="1"
+                                required
+                            >
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex gap-4 pt-4">
+                            <button 
+                                type="submit" 
+                                class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2.5 rounded-lg transition duration-200 shadow-md hover:shadow-lg"
+                            >
+                                <i class="fa-solid fa-check mr-2"></i> Add Product
+                            </button>
+                            <button 
+                                type="reset" 
+                                class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition duration-200"
+                            >
+                                <i class="fa-solid fa-redo mr-2"></i> Clear
+                            </button>
+                        </div>
+
+                        <!-- Success/Error Messages -->
+                        <div class="successMessage hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+                            <i class="fa-solid fa-check-circle mr-2"></i> Product added successfully!
+                        </div>
+                        <div class="errorMessage hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <footer class="mt-8 text-center text-gray-400 text-xs pb-4">
+                &copy; 2026 Jha Retail System. All rights reserved.
+            </footer>
+
+        </div>
+    </main>
+
+</body>
+
+<script src="/assets/Js/add-product.js"></script>
+
+</html>
