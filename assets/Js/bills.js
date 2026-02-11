@@ -3,19 +3,51 @@ let filteredBills = [];
 let currentModalBill = null;
 let currentEditingBillIndex = -1;
 let modalMode = 'view'; // 'view' or 'edit'
+let currentBillType = 'sell'; // 'sell' or 'buy'
 
 // Load bills on page load
 document.addEventListener('DOMContentLoaded', function() {
     loadBills();
-    renderBills(allBills);
+    filterByBillType();
     updateStats();
 });
+
+// Switch bill type filter (Sell or Buy)
+function switchBillType(type) {
+    currentBillType = type;
+    
+    // Update button styles
+    const sellBtn = document.getElementById('sellBillsBtn');
+    const buyBtn = document.getElementById('buyBillsBtn');
+    
+    if (type === 'sell') {
+        sellBtn.classList.add('active-bill-type');
+        buyBtn.classList.remove('active-bill-type');
+    } else {
+        buyBtn.classList.add('active-bill-type');
+        sellBtn.classList.remove('active-bill-type');
+    }
+    
+    // Re-filter and display bills
+    filterByBillType();
+}
 
 // Load bills from localStorage
 function loadBills() {
     const bills = localStorage.getItem('bills');
     allBills = bills ? JSON.parse(bills) : [];
-    filteredBills = [...allBills];
+}
+
+// Filter bills by type (sell or buy) and render
+function filterByBillType() {
+    // Filter bills based on current bill type (default to 'sell' for old bills without type)
+    filteredBills = allBills.filter(bill => {
+        const billType = bill.billMode || 'sell'; // Default to 'sell' for backward compatibility
+        return billType === currentBillType;
+    });
+    
+    renderBills(filteredBills);
+    updateStats(filteredBills);
 }
 
 // Render bills in table
@@ -36,17 +68,17 @@ function renderBills(bills) {
     tbody.innerHTML = bills.map((bill, index) => `
         <tr class="hover:bg-gray-50 transition">
             <td class="px-6 py-4 font-semibold text-gray-800">${bill.billTitle || 'N/A'}</td>
-            <td class="px-6 py-4 text-gray-700">${bill.retailerName}</td>
-            <td class="px-6 py-4 text-center text-gray-700">${bill.billDate}</td>
-            <td class="px-6 py-4 text-right font-semibold text-gray-800">Rs ${bill.totalAmount.toFixed(2)}</td>
+            <td class="px-6 py-4 text-gray-700">${bill.retailerName || 'N/A'}</td>
+            <td class="px-6 py-4 text-center text-gray-700">${bill.billDate || 'N/A'}</td>
+            <td class="px-6 py-4 text-right font-semibold text-gray-800">Rs ${(bill.totalAmount || 0).toFixed(2)}</td>
             <td class="px-6 py-4 text-center">
                 <span class="px-3 py-1 rounded-full text-sm font-semibold ${bill.paymentType === 'full' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}">
                     ${bill.paymentType === 'full' ? 'Full' : 'Partial'}
                 </span>
             </td>
-            <td class="px-6 py-4 text-right text-gray-700">Rs ${bill.paidAmount.toFixed(2)}</td>
-            <td class="px-6 py-4 text-right font-semibold ${bill.remainingBalance > 0 ? 'text-orange-600' : 'text-green-600'}">
-                Rs ${bill.remainingBalance.toFixed(2)}
+            <td class="px-6 py-4 text-right text-gray-700">Rs ${(bill.paidAmount || 0).toFixed(2)}</td>
+            <td class="px-6 py-4 text-right font-semibold ${(bill.remainingBalance || 0) > 0 ? 'text-orange-600' : 'text-green-600'}">
+                Rs ${(bill.remainingBalance || 0).toFixed(2)}
             </td>
             <td class="px-6 py-4 text-center">
                 <div class="flex gap-2 justify-center flex-wrap">
@@ -75,11 +107,13 @@ function filterBills() {
     const filterPaymentType = document.getElementById('filterPaymentType').value;
 
     filteredBills = allBills.filter(bill => {
+        const billType = bill.billMode || 'sell'; // Default to 'sell' for backward compatibility
+        const matchType = billType === currentBillType;
         const matchRetailer = bill.retailerName.toLowerCase().includes(searchRetailer);
         const matchDate = !filterDate || bill.billDate === filterDate;
         const matchPaymentType = !filterPaymentType || bill.paymentType === filterPaymentType;
 
-        return matchRetailer && matchDate && matchPaymentType;
+        return matchType && matchRetailer && matchDate && matchPaymentType;
     });
 
     renderBills(filteredBills);
@@ -92,9 +126,7 @@ function resetFilters() {
     document.getElementById('filterDate').value = '';
     document.getElementById('filterPaymentType').value = '';
     
-    filteredBills = [...allBills];
-    renderBills(filteredBills);
-    updateStats(allBills);
+    filterByBillType();
 }
 
 // View bill details in modal
@@ -103,13 +135,19 @@ function viewBillDetails(index) {
     currentModalBill = filteredBills[index];
     const bill = currentModalBill;
 
-    const itemsHtml = bill.items.map((item, i) => `
+    if (!bill) {
+        alert('Bill not found');
+        return;
+    }
+
+    const items = bill.items || [];
+    const itemsHtml = items.map((item, i) => `
         <tr>
             <td class="px-4 py-2 border">${i + 1}</td>
-            <td class="px-4 py-2 border">${item.productName}</td>
-            <td class="px-4 py-2 border text-center">${item.minSize} - ${item.maxSize}</td>
-            <td class="px-4 py-2 border text-right">Rs ${item.unitPrice.toFixed(2)}</td>
-            <td class="px-4 py-2 border text-right">Rs ${item.total.toFixed(2)}</td>
+            <td class="px-4 py-2 border">${item.productName || 'N/A'}</td>
+            <td class="px-4 py-2 border text-center">${item.minSize || 0} - ${item.maxSize || 0}</td>
+            <td class="px-4 py-2 border text-right">Rs ${(item.unitPrice || 0).toFixed(2)}</td>
+            <td class="px-4 py-2 border text-right">Rs ${(item.total || 0).toFixed(2)}</td>
         </tr>
     `).join('');
 
@@ -163,19 +201,19 @@ function viewBillDetails(index) {
             <div class="border-t pt-4 grid grid-cols-2 gap-4">
                 <div>
                     <p class="text-gray-600 text-sm">Subtotal</p>
-                    <p class="font-semibold text-gray-800">Rs ${bill.subtotal.toFixed(2)}</p>
+                    <p class="font-semibold text-gray-800">Rs ${(bill.subtotal || 0).toFixed(2)}</p>
                 </div>
                 <div>
-                    <p class="text-gray-600 text-sm">Discount (${bill.discountPercent}%)</p>
-                    <p class="font-semibold text-gray-800">Rs ${bill.discountAmount.toFixed(2)}</p>
+                    <p class="text-gray-600 text-sm">Discount (${bill.discountPercent || 0}%)</p>
+                    <p class="font-semibold text-gray-800">Rs ${(bill.discountAmount || 0).toFixed(2)}</p>
                 </div>
                 <div>
-                    <p class="text-gray-600 text-sm">Tax (${bill.taxPercent}%)</p>
-                    <p class="font-semibold text-gray-800">Rs ${bill.taxAmount.toFixed(2)}</p>
+                    <p class="text-gray-600 text-sm">Tax (${bill.taxPercent || 0}%)</p>
+                    <p class="font-semibold text-gray-800">Rs ${(bill.taxAmount || 0).toFixed(2)}</p>
                 </div>
                 <div class="border-t pt-2">
                     <p class="text-gray-600 text-sm">Total Amount</p>
-                    <p class="font-bold text-lg text-indigo-600">Rs ${bill.totalAmount.toFixed(2)}</p>
+                    <p class="font-bold text-lg text-indigo-600">Rs ${(bill.totalAmount || 0).toFixed(2)}</p>
                 </div>
             </div>
 
@@ -192,12 +230,12 @@ function viewBillDetails(index) {
                 </div>
                 <div>
                     <p class="text-gray-600 text-sm">Paid Amount</p>
-                    <p class="font-semibold text-gray-800">Rs ${bill.paidAmount.toFixed(2)}</p>
+                    <p class="font-semibold text-gray-800">Rs ${(bill.paidAmount || 0).toFixed(2)}</p>
                 </div>
                 <div>
                     <p class="text-gray-600 text-sm">Remaining Balance</p>
                     <p class="font-semibold ${bill.remainingBalance > 0 ? 'text-orange-600' : 'text-green-600'}">
-                        Rs ${bill.remainingBalance.toFixed(2)}
+                        Rs ${(bill.remainingBalance || 0).toFixed(2)}
                     </p>
                 </div>
             </div>
@@ -210,9 +248,9 @@ function viewBillDetails(index) {
                         <div class="flex justify-between items-center p-2 bg-white rounded border border-gray-100">
                             <div>
                                 <p class="text-sm font-medium text-gray-700">Payment #${i + 1}</p>
-                                <p class="text-xs text-gray-500">Date: ${payment.date}</p>
+                                <p class="text-xs text-gray-500">Date: ${payment.date || 'N/A'}</p>
                             </div>
-                            <p class="font-bold text-green-600">Rs ${payment.amount.toFixed(2)}</p>
+                            <p class="font-bold text-green-600">Rs ${(payment.amount || 0).toFixed(2)}</p>
                         </div>
                     `).join('')}
                 </div>
@@ -259,13 +297,14 @@ function printBillFromModal() {
 
 // Print bill content
 function printBillContent(bill) {
-    const itemsHtml = bill.items.map((item, i) => `
+    const items = bill.items || [];
+    const itemsHtml = items.map((item, i) => `
         <tr style="border: 1px solid #ddd;">
             <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${i + 1}</td>
-            <td style="border: 1px solid #ddd; padding: 8px;">${item.productName}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.minSize} - ${item.maxSize}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">Rs ${item.unitPrice.toFixed(2)}</td>
-            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">Rs ${item.total.toFixed(2)}</td>
+            <td style="border: 1px solid #ddd; padding: 8px;">${item.productName || 'N/A'}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${item.minSize || 0} - ${item.maxSize || 0}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">Rs ${(item.unitPrice || 0).toFixed(2)}</td>
+            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">Rs ${(item.total || 0).toFixed(2)}</td>
         </tr>
     `).join('');
 
@@ -329,12 +368,12 @@ function printBillContent(bill) {
             </table>
 
             <div class="totals">
-                <p><strong>Subtotal:</strong> Rs ${bill.subtotal.toFixed(2)}</p>
-                <p><strong>Discount (${bill.discountPercent}%):</strong> Rs ${bill.discountAmount.toFixed(2)}</p>
-                <p><strong>Tax (${bill.taxPercent}%):</strong> Rs ${bill.taxAmount.toFixed(2)}</p>
-                <p style="border-top: 1px solid #ddd; padding-top: 5px;"><strong>Total:</strong> Rs ${bill.totalAmount.toFixed(2)}</p>
-                <p><strong>Paid:</strong> Rs ${bill.paidAmount.toFixed(2)}</p>
-                ${bill.remainingBalance > 0 ? `<p style="color: #FF6B6B;"><strong>Balance:</strong> Rs ${bill.remainingBalance.toFixed(2)}</p>` : `<p style="color: #4CAF50;"><strong>Status:</strong> Fully Paid</p>`}
+                <p><strong>Subtotal:</strong> Rs ${(bill.subtotal || 0).toFixed(2)}</p>
+                <p><strong>Discount (${bill.discountPercent || 0}%):</strong> Rs ${(bill.discountAmount || 0).toFixed(2)}</p>
+                <p><strong>Tax (${bill.taxPercent || 0}%):</strong> Rs ${(bill.taxAmount || 0).toFixed(2)}</p>
+                <p style="border-top: 1px solid #ddd; padding-top: 5px;"><strong>Total:</strong> Rs ${(bill.totalAmount || 0).toFixed(2)}</p>
+                <p><strong>Paid:</strong> Rs ${(bill.paidAmount || 0).toFixed(2)}</p>
+                ${(bill.remainingBalance || 0) > 0 ? `<p style="color: #FF6B6B;"><strong>Balance:</strong> Rs ${(bill.remainingBalance || 0).toFixed(2)}</p>` : `<p style="color: #4CAF50;"><strong>Status:</strong> Fully Paid</p>`}
             </div>
 
             <div style="clear: both;"></div>
@@ -386,7 +425,7 @@ function exportToCSV() {
     
     filteredBills.forEach(bill => {
         const notes = bill.notes ? bill.notes.replace(/,/g, ';') : '';
-        csv += `"${bill.billTitle || ''}","${bill.retailerName}","${bill.billDate}","${bill.totalAmount.toFixed(2)}","${bill.paidAmount.toFixed(2)}","${bill.remainingBalance.toFixed(2)}","${bill.paymentType}","${bill.paymentMethod || ''}","${notes}"\n`;
+        csv += `"${bill.billTitle || ''}","${bill.retailerName || ''}","${bill.billDate || ''}","${(bill.totalAmount || 0).toFixed(2)}","${(bill.paidAmount || 0).toFixed(2)}","${(bill.remainingBalance || 0).toFixed(2)}","${bill.paymentType || ''}","${bill.paymentMethod || ''}","${notes}"\n`;
     });
 
     const blob = new Blob([csv], { type: 'text/csv' });
@@ -403,9 +442,9 @@ function exportToCSV() {
 // Update statistics
 function updateStats(bills = allBills) {
     const totalBills = bills.length;
-    const totalRevenue = bills.reduce((sum, bill) => sum + bill.totalAmount, 0);
-    const totalPaid = bills.reduce((sum, bill) => sum + bill.paidAmount, 0);
-    const totalBalance = bills.reduce((sum, bill) => sum + bill.remainingBalance, 0);
+    const totalRevenue = bills.reduce((sum, bill) => sum + (bill.totalAmount || 0), 0);
+    const totalPaid = bills.reduce((sum, bill) => sum + (bill.paidAmount || 0), 0);
+    const totalBalance = bills.reduce((sum, bill) => sum + (bill.remainingBalance || 0), 0);
 
     document.getElementById('totalBills').textContent = totalBills;
     document.getElementById('totalRevenue').textContent = `Rs ${totalRevenue.toFixed(2)}`;
@@ -418,6 +457,12 @@ function editBillPayment(index) {
     modalMode = 'edit';
     currentModalBill = filteredBills[index];
     const bill = currentModalBill;
+    
+    if (!bill) {
+        alert('Bill not found');
+        return;
+    }
+    
     currentEditingBillIndex = allBills.findIndex(b => b === bill);
 
     const editHtml = `
@@ -429,15 +474,15 @@ function editBillPayment(index) {
                 </div>
                 <div>
                     <p class="text-gray-600 text-sm">Retailer</p>
-                    <p class="font-semibold text-gray-800">${bill.retailerName}</p>
+                    <p class="font-semibold text-gray-800">${bill.retailerName || 'N/A'}</p>
                 </div>
                 <div>
                     <p class="text-gray-600 text-sm">Date</p>
-                    <p class="font-semibold text-gray-800">${bill.billDate}</p>
+                    <p class="font-semibold text-gray-800">${bill.billDate || 'N/A'}</p>
                 </div>
                 <div>
                     <p class="text-gray-600 text-sm">Total Amount</p>
-                    <p class="font-semibold text-gray-800">Rs ${bill.totalAmount.toFixed(2)}</p>
+                    <p class="font-semibold text-gray-800">Rs ${(bill.totalAmount || 0).toFixed(2)}</p>
                 </div>
             </div>
 
@@ -446,18 +491,18 @@ function editBillPayment(index) {
                 <div class="grid grid-cols-2 gap-4 bg-blue-50 p-4 rounded-lg mb-4 border border-blue-200">
                     <div>
                         <p class="text-gray-600 text-sm">Current Pending Balance</p>
-                        <p class="font-bold text-lg text-blue-600">Rs ${bill.remainingBalance.toFixed(2)}</p>
+                        <p class="font-bold text-lg text-blue-600">Rs ${(bill.remainingBalance || 0).toFixed(2)}</p>
                     </div>
                     <div>
                         <p class="text-gray-600 text-sm">Total Bill Amount</p>
-                        <p class="font-bold text-lg text-gray-800">Rs ${bill.totalAmount.toFixed(2)}</p>
+                        <p class="font-bold text-lg text-gray-800">Rs ${(bill.totalAmount || 0).toFixed(2)}</p>
                     </div>
                 </div>
 
                 <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 mb-4">
-                    <label class="block text-sm font-semibold text-gray-700 mb-2">Set New Pending Balance (Rs) <span class="text-red-500">*</span></label>
-                    <input type="number" id="newPendingBalanceInput" min="0" step="0.01" placeholder="Enter new pending amount" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" value="${bill.remainingBalance.toFixed(2)}">
-                    <p class="text-xs text-gray-600 mt-2">Can set from 0 to Rs ${bill.totalAmount.toFixed(2)}</p>
+                    <label class="block text-sm font-semibold text-gray-700 mb-2">Amount Given by Retailer (Rs) <span class="text-red-500">*</span></label>
+                    <input type="number" id="newPendingBalanceInput" min="0" step="0.01" placeholder="Enter payment received" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-lg" value="0.00">
+                    <p class="text-xs text-gray-600 mt-2">Can set from 0 to Rs ${(bill.remainingBalance || 0).toFixed(2)}</p>
                 </div>
 
                 <div class="grid grid-cols-2 gap-4">
@@ -467,7 +512,7 @@ function editBillPayment(index) {
                     </div>
                     <div class="bg-green-50 p-4 rounded-lg border border-green-200">
                         <p class="text-sm font-semibold text-gray-700 mb-2">New Paid Amount</p>
-                        <p class="font-bold text-xl text-green-600" id="newPaidAmountDisplay">Rs ${bill.paidAmount.toFixed(2)}</p>
+                        <p class="font-bold text-xl text-green-600" id="newPaidAmountDisplay">Rs ${(bill.paidAmount || 0).toFixed(2)}</p>
                     </div>
                 </div>
             </div>
@@ -486,20 +531,23 @@ function editBillPayment(index) {
         const newBalanceInput = document.getElementById('newPendingBalanceInput');
         if (newBalanceInput) {
             newBalanceInput.addEventListener('keyup', function() {
-                const newBalance = parseFloat(this.value);
+                const paymentReceived = parseFloat(this.value);
                 
-                if (isNaN(newBalance)) {
+                if (isNaN(paymentReceived) || paymentReceived === 0) {
                     document.getElementById('reductionAmountDisplay').textContent = `Rs 0.00`;
-                    document.getElementById('newPaidAmountDisplay').textContent = `Rs ${bill.paidAmount.toFixed(2)}`;
+                    document.getElementById('newPaidAmountDisplay').textContent = `Rs ${(bill.paidAmount || 0).toFixed(2)}`;
                     return;
                 }
 
-                // Ensure newBalance is within valid range
-                const validBalance = Math.max(0, Math.min(newBalance, bill.totalAmount));
-                const newPaidAmount = bill.totalAmount - validBalance;
-                const paymentAmount = newPaidAmount - bill.paidAmount;
+                // Ensure payment doesn't exceed pending balance and round to 2 decimal places
+                const validPayment = Math.max(0, Math.min(paymentReceived, bill.remainingBalance || 0));
+                const roundedPayment = Math.round(validPayment * 100) / 100;
                 
-                document.getElementById('reductionAmountDisplay').textContent = `Rs ${Math.abs(paymentAmount).toFixed(2)}`;
+                // Calculate new values
+                const newPendingBalance = Math.round(((bill.remainingBalance || 0) - roundedPayment) * 100) / 100;
+                const newPaidAmount = Math.round(((bill.paidAmount || 0) + roundedPayment) * 100) / 100;
+                
+                document.getElementById('reductionAmountDisplay').textContent = `Rs ${roundedPayment.toFixed(2)}`;
                 document.getElementById('newPaidAmountDisplay').textContent = `Rs ${newPaidAmount.toFixed(2)}`;
             });
             newBalanceInput.select();
@@ -523,59 +571,62 @@ function handleModalAction() {
 function savePaymentUpdate() {
     if (currentEditingBillIndex === -1) return;
     
-    const newBalanceInput = document.getElementById('newPendingBalanceInput');
-    if (!newBalanceInput) return;
+    const paymentInput = document.getElementById('newPendingBalanceInput');
+    if (!paymentInput) return;
 
-    const newBalance = parseFloat(newBalanceInput.value);
+    const paymentReceived = parseFloat(paymentInput.value);
     const bill = allBills[currentEditingBillIndex];
 
     // Validation
-    if (isNaN(newBalance)) {
+    if (isNaN(paymentReceived)) {
         alert('Please enter a valid amount');
         return;
     }
 
-    if (newBalance < 0) {
-        alert('Pending balance cannot be negative');
+    if (paymentReceived < 0) {
+        alert('Payment amount cannot be negative');
         return;
     }
 
-    if (newBalance > bill.totalAmount) {
-        alert(`Pending balance cannot exceed total bill amount: Rs ${bill.totalAmount.toFixed(2)}`);
+    if (paymentReceived === 0) {
+        alert('Please enter an amount greater than 0');
         return;
     }
 
-    // Calculate new paid amount to maintain: totalAmount = paidAmount + remainingBalance
-    const newPaidAmount = bill.totalAmount - newBalance;
-    const previousPaidAmount = bill.paidAmount;
-    const previousRemainingBalance = bill.remainingBalance;
+    if (paymentReceived > (bill.remainingBalance || 0)) {
+        alert(`Payment cannot exceed pending balance: Rs ${(bill.remainingBalance || 0).toFixed(2)}`);
+        return;
+    }
 
-    // Update the bill - maintain the invariant
+    // Calculate new values based on payment received
+    const roundedPayment = Math.round(paymentReceived * 100) / 100;
+    const newPaidAmount = Math.round(((bill.paidAmount || 0) + roundedPayment) * 100) / 100;
+    // Force remainingBalance to be derived from totalAmount - paidAmount to maintain invariant
+    const newPendingBalance = Math.round(((bill.totalAmount || 0) - newPaidAmount) * 100) / 100;
+    
+    const previousPaidAmount = bill.paidAmount || 0;
+    const previousRemainingBalance = bill.remainingBalance || 0;
+
+    // Update the bill
     bill.paidAmount = newPaidAmount;
-    bill.remainingBalance = newBalance;
+    bill.remainingBalance = newPendingBalance;
 
-    // Verify the invariant holds
-    const checkSum = bill.paidAmount + bill.remainingBalance;
-    if (Math.abs(checkSum - bill.totalAmount) > 0.01) {
-        // Rollback if there's a calculation error
-        bill.paidAmount = previousPaidAmount;
-        bill.remainingBalance = previousRemainingBalance;
-        alert('Calculation error. Please try again.');
-        return;
+    // Force exact invariant by adjusting remainingBalance if needed (to handle floating-point errors)
+    const calculatedRemainder = bill.totalAmount - bill.paidAmount;
+    if (Math.abs(calculatedRemainder - bill.remainingBalance) < 0.01) {
+        bill.remainingBalance = Math.round(calculatedRemainder * 100) / 100;
     }
-
-    const paymentAmount = newPaidAmount - previousPaidAmount;
 
     // Initialize payment history if it doesn't exist
     if (!bill.paymentHistory) {
         bill.paymentHistory = [];
     }
 
-    // Add to payment history if there's a new payment
-    if (paymentAmount > 0) {
+    // Add to payment history only if there's a meaningful payment (> 0.01)
+    if (Math.abs(roundedPayment) > 0.01) {
         bill.paymentHistory.push({
             date: new Date().toISOString().split('T')[0],
-            amount: paymentAmount,
+            amount: roundedPayment,
             type: 'additional'
         });
     }
@@ -584,13 +635,7 @@ function savePaymentUpdate() {
     allBills[currentEditingBillIndex] = bill;
     localStorage.setItem('bills', JSON.stringify(allBills));
 
-    if (paymentAmount > 0) {
-        alert(`✓ Payment of Rs ${paymentAmount.toFixed(2)} recorded successfully!\n\nPreviously Paid: Rs ${previousPaidAmount.toFixed(2)}\nNow Paid: Rs ${bill.paidAmount.toFixed(2)}\nRemaining Balance: Rs ${newBalance.toFixed(2)}`);
-    } else if (paymentAmount < 0) {
-        alert(`✓ Paid amount adjusted by Rs ${Math.abs(paymentAmount).toFixed(2)}\n\nPreviously Paid: Rs ${previousPaidAmount.toFixed(2)}\nNow Paid: Rs ${bill.paidAmount.toFixed(2)}\nRemaining Balance: Rs ${newBalance.toFixed(2)}`);
-    } else {
-        alert('No changes made');
-    }
+    alert(`✓ Payment of Rs ${roundedPayment.toFixed(2)} recorded successfully!\n\nPreviously Paid: Rs ${previousPaidAmount.toFixed(2)}\nNow Paid: Rs ${(bill.paidAmount || 0).toFixed(2)}\nRemaining Balance: Rs ${newPendingBalance.toFixed(2)}`);
     
     // Reset modal mode
     modalMode = 'view';

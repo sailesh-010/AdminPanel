@@ -45,10 +45,6 @@ app.get('/product', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'product.html'));
 });
 
-app.get('/add-product', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'add.html'));
-});
-
 app.get('/sale', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'sale.html'));
 });
@@ -59,6 +55,18 @@ app.get('/bill', (req, res) => {
 
 app.get('/bills', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'bills.html'));
+});
+
+app.get('/stock', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'stock.html'));
+});
+
+app.get('/workers', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'workers.html'));
+});
+
+app.get('/revenue', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'revenue.html'));
 });
 
 app.listen(PORT, () => {

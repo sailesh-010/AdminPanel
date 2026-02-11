@@ -19,6 +19,7 @@ function setActive(element) {
 
 // Initialize
 let billItems = [];
+let billMode = 'sell'; // 'sell' or 'buy'
 
 document.addEventListener('DOMContentLoaded', function() {
     // Set current date
@@ -35,14 +36,52 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
 });
 
+// Switch Bill Mode (Sell or Buy)
+function switchBillMode(mode) {
+    try {
+        billMode = mode;
+        
+        // Update button styles
+        const sellBtn = document.getElementById('sellModeBtn');
+        const buyBtn = document.getElementById('buyModeBtn');
+        
+        if (mode === 'sell') {
+            sellBtn.classList.add('active-mode');
+            buyBtn.classList.remove('active-mode');
+            const icon = document.querySelector('#retailerSection h3 i');
+            if (icon) {
+                icon.className = 'fa-solid fa-user-tie text-red-500';
+            }
+            document.getElementById('partyLabel').textContent = 'Retailer';
+            document.getElementById('partyNameLabel').textContent = 'Retailer';
+            document.getElementById('retailerName').placeholder = 'e.g., Sita Retailers, Gopal Kirana';
+        } else {
+            buyBtn.classList.add('active-mode');
+            sellBtn.classList.remove('active-mode');
+            const icon = document.querySelector('#retailerSection h3 i');
+            if (icon) {
+                icon.className = 'fa-solid fa-user-tie text-blue-500';
+            }
+            document.getElementById('partyLabel').textContent = 'Supplier/Vendor';
+            document.getElementById('partyNameLabel').textContent = 'Supplier/Vendor';
+            document.getElementById('retailerName').placeholder = 'e.g., Wholesale Supplier, Factory Name';
+        }
+        
+        // Clear form
+        clearBillForm();
+    } catch (error) {
+        console.error('Error in switchBillMode:', error);
+        alert('Error switching bill mode. Please refresh the page.');
+    }
+}
+
 // Setup Event Listeners
 function setupEventListeners() {
     // Add Item Button
     document.getElementById('addItemBtn').addEventListener('click', addItem);
 
-    // Discount and Tax calculation
+    // Discount calculation
     document.getElementById('discountPercent').addEventListener('change', updateCalculations);
-    document.getElementById('taxPercent').addEventListener('change', updateCalculations);
 
     // Payment Type Change
     document.querySelectorAll('input[name="paymentType"]').forEach(radio => {
@@ -156,18 +195,12 @@ function updateCalculations() {
     const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
     const discountAmount = (subtotal * discountPercent) / 100;
 
-    // Get tax
-    const taxPercent = parseFloat(document.getElementById('taxPercent').value) || 0;
-    const taxBase = subtotal - discountAmount;
-    const taxAmount = (taxBase * taxPercent) / 100;
-
-    // Calculate total
-    const totalAmount = subtotal - discountAmount + taxAmount;
+    // Calculate total (without tax)
+    const totalAmount = subtotal - discountAmount;
 
     // Update UI
     document.getElementById('subtotal').textContent = subtotal.toFixed(2);
     document.getElementById('discountAmount').value = `Rs ${discountAmount.toFixed(2)}`;
-    document.getElementById('taxAmount').value = `Rs ${taxAmount.toFixed(2)}`;
     document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
 
     // Update remaining balance if partial payment
@@ -238,8 +271,6 @@ function saveBill() {
         subtotal: parseFloat(document.getElementById('subtotal').textContent),
         discountPercent: parseFloat(document.getElementById('discountPercent').value) || 0,
         discountAmount: parseFloat(document.getElementById('discountAmount').value.replace('Rs ', '')),
-        taxPercent: parseFloat(document.getElementById('taxPercent').value) || 0,
-        taxAmount: parseFloat(document.getElementById('taxAmount').value.replace('Rs ', '')),
         totalAmount: parseFloat(document.getElementById('totalAmount').textContent),
         paymentType,
         paidAmount: paymentType === 'partial' ? parseFloat(document.getElementById('paidAmount').value) : parseFloat(document.getElementById('totalAmount').textContent),
@@ -247,6 +278,7 @@ function saveBill() {
         paymentMethod,
         notes: document.getElementById('notes').value,
         createdAt: new Date().toISOString(),
+        billMode: billMode, // Add bill mode (sell or buy)
         paymentHistory: paymentType === 'partial' ? [
             {
                 date: new Date().toISOString().split('T')[0],
@@ -256,13 +288,14 @@ function saveBill() {
         ] : []
     };
 
-    // Save to localStorage (for demo)
+    // Save to localStorage based on bill mode
     let bills = JSON.parse(localStorage.getItem('bills')) || [];
     bills.push(billData);
     localStorage.setItem('bills', JSON.stringify(bills));
 
     // Show success message
-    alert(`✓ Bill saved successfully!\n\nRetailer: ${retailerName}\nTotal: Rs ${billData.totalAmount.toFixed(2)}\nPayment Type: ${paymentType === 'full' ? 'Full Payment' : 'Partial Payment'}`);
+    const partyType = billMode === 'sell' ? 'Retailer' : 'Supplier/Vendor';
+    alert(`✓ Bill saved successfully!\n\n${partyType}: ${retailerName}\nTotal: Rs ${billData.totalAmount.toFixed(2)}\nPayment Type: ${paymentType === 'full' ? 'Full Payment' : 'Partial Payment'}`);
 
     // Reset form
     resetForm();
@@ -280,7 +313,6 @@ function printBill() {
     const billDate = document.getElementById('billDate').value;
     const subtotal = document.getElementById('subtotal').textContent;
     const discountAmount = document.getElementById('discountAmount').value;
-    const taxAmount = document.getElementById('taxAmount').value;
     const totalAmount = document.getElementById('totalAmount').textContent;
     const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
     const paymentMethod = document.getElementById('paymentMethod').value;
@@ -368,7 +400,6 @@ function printBill() {
             <div class="summary">
                 <p><span>Subtotal:</span> <span>Rs ${subtotal}</span></p>
                 <p><span>Discount:</span> <span>${discountAmount}</span></p>
-                <p><span>Tax:</span> <span>${taxAmount}</span></p>
                 <p class="total"><span>Total:</span> <span>Rs ${totalAmount}</span></p>
                 ${paidInfo}
             </div>
@@ -405,7 +436,6 @@ function resetForm() {
 
     // Reset numbers
     document.getElementById('discountPercent').value = '';
-    document.getElementById('taxPercent').value = '';
     document.getElementById('paidAmount').value = '';
     document.querySelector('input[name="paymentType"][value="full"]').checked = true;
     document.getElementById('paymentMethod').value = '';
@@ -413,7 +443,6 @@ function resetForm() {
     // Reset calculations
     document.getElementById('subtotal').textContent = '0.00';
     document.getElementById('discountAmount').value = 'Rs 0.00';
-    document.getElementById('taxAmount').value = 'Rs 0.00';
     document.getElementById('totalAmount').textContent = '0.00';
     document.getElementById('remainingBalance').textContent = '0.00';
 
@@ -426,4 +455,72 @@ function resetForm() {
 
     // Focus on retailer name
     document.getElementById('retailerName').focus();
+}
+
+// Clear form for mode switching
+function clearBillForm() {
+    try {
+        // Clear items
+        billItems = [];
+        const itemsList = document.getElementById('itemsList');
+        const itemCount = document.getElementById('itemCount');
+        if (itemsList) itemsList.innerHTML = '';
+        if (itemCount) itemCount.textContent = '0';
+
+        // Reset form fields
+        const fields = ['retailerName', 'contactNumber', 'email', 'address', 'billTitle', 'notes'];
+        fields.forEach(id => {
+            const elem = document.getElementById(id);
+            if (elem) elem.value = '';
+        });
+
+        // Reset numbers
+        const numberFields = ['discountPercent', 'paidAmount'];
+        numberFields.forEach(id => {
+            const elem = document.getElementById(id);
+            if (elem) elem.value = '';
+        });
+
+        const paymentTypeRadio = document.querySelector('input[name="paymentType"][value="full"]');
+        if (paymentTypeRadio) paymentTypeRadio.checked = true;
+
+        const paymentMethod = document.getElementById('paymentMethod');
+        if (paymentMethod) paymentMethod.value = '';
+
+        // Reset calculations
+        const textFields = {
+            'subtotal': '0.00',
+            'totalAmount': '0.00',
+            'remainingBalance': '0.00'
+        };
+        Object.entries(textFields).forEach(([id, value]) => {
+            const elem = document.getElementById(id);
+            if (elem) elem.textContent = value;
+        });
+
+        const valueFields = {
+            'discountAmount': 'Rs 0.00'
+        };
+        Object.entries(valueFields).forEach(([id, value]) => {
+            const elem = document.getElementById(id);
+            if (elem) elem.value = value;
+        });
+
+        // Reset date to today
+        const billDate = document.getElementById('billDate');
+        if (billDate) {
+            const today = new Date().toISOString().split('T')[0];
+            billDate.value = today;
+        }
+
+        // Hide paid amount div
+        const paidAmountDiv = document.getElementById('paidAmountDiv');
+        if (paidAmountDiv) paidAmountDiv.classList.add('hidden');
+
+        // Focus on retailer name
+        const retailerName = document.getElementById('retailerName');
+        if (retailerName) retailerName.focus();
+    } catch (error) {
+        console.error('Error in clearBillForm:', error);
+    }
 }

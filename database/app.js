@@ -4,6 +4,7 @@ import userRoutes from './routes/user.routes.js';
 import appDataRoutes from './routes/appData.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
 import productRoutes from './routes/product.routes.js';
+import workerRoutes from './routes/worker.routes.js';
 
 import express from 'express';
 import cors from 'cors';
@@ -18,5 +19,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/app', appDataRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/products', productRoutes);
+app.use('/api/workers', workerRoutes);
 
 export default app;

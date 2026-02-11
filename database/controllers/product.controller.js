@@ -194,17 +194,20 @@ export const getProductById = async (req, res) => {
 // Update a product
 export const updateProduct = async (req, res) => {
   const { id } = req.params;
-  const { name, category, price, sizeMin, sizeMax, quantity } = req.body;
+  const { name, price, sizeMin, sizeMax, quantity } = req.body;
 
   try {
     const productData = {
         name,
-        category,
-        price,
-        size_min: sizeMin,
-        size_max: sizeMax,
-        quantity,
+        price: parseFloat(price),
+        min_size: sizeMin !== undefined ? parseFloat(sizeMin) : undefined,
+        max_size: sizeMax !== undefined ? parseFloat(sizeMax) : undefined,
+        stock_quantity: quantity !== undefined ? parseInt(quantity) : undefined,
     };
+    
+    // Remove undefined values
+    Object.keys(productData).forEach(key => productData[key] === undefined && delete productData[key]);
+    
     const updatedProduct = await ProductService.updateProduct(req.tenant_id, id, productData);
 
     res.json({
@@ -212,6 +215,7 @@ export const updateProduct = async (req, res) => {
       product: updatedProduct
     });
   } catch (err) {
+    console.error('Update product error:', err);
     res.status(500).json({ error: err.message });
   }
 };
