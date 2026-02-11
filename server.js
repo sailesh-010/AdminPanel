@@ -49,6 +49,21 @@ app.get('/add-product', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'add.html'));
 });
 
+<<<<<<< HEAD
+=======
+app.get('/sale', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'sale.html'));
+});
+
+app.get('/bill', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'bill.html'));
+});
+
+app.get('/bills', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'bills.html'));
+});
+
+>>>>>>> 308a3c0 (initial commit)
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });

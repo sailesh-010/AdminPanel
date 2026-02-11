@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jha System - Add Bill</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        
+        /* Custom Scrollbar for better aesthetics */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8; 
+        }
+
+        .sidebar-link {
+            transition: all 0.2s;
+        }
+        .sidebar-link:hover, .sidebar-link.active {
+            background: linear-gradient(90deg, #E53935 0%, #EF5350 100%);
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(229, 57, 53, 0.3);
+            transform: translateX(4px);
+        }
+        .sidebar-link:hover i, .sidebar-link.active i {
+            color: white;
+        }
+
+        .item-card {
+            transition: all 0.2s;
+        }
+        .item-card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 h-screen overflow-hidden flex">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
+
+    <!-- SIDEBAR -->
+    <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col h-full shadow-xl lg:shadow-none">
+        
+        <!-- Logo -->
+        <div class="p-6 border-b border-gray-100">
+            <div class="flex items-center gap-3">
+                <div class="bg-[#E53935] text-white h-10 w-10 flex items-center justify-center rounded-lg font-bold text-2xl shadow-md">सा</div>
+                <div>
+                    <h1 class="text-xl font-bold text-gray-800 tracking-tight">Jha System</h1>
+                    <p class="text-[10px] text-gray-400 font-medium uppercase tracking-wider">"साझा समाधान, सजिलो व्यापार"</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 overflow-y-auto py-6 px-4 space-y-1">
+            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">Main Menu</p>
+            
+            <a href="/dashboard" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-house w-5 text-center transition-colors"></i> Dashboard
+            </a>
+            <a href="/sale" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-cart-shopping w-5 text-center text-gray-400 transition-colors"></i> Sale
+            </a>
+            <a href="#" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-boxes-stacked w-5 text-center text-gray-400 transition-colors"></i> Stocks
+            </a>
+            <a href="/add-product" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-border-all w-5 text-center text-gray-400 transition-colors"></i> Add Items
+            </a>
+            
+            <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2 mt-6">Finance & People</p>
+            
+            <a href="/bill" onclick="setActive(this)" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-file-invoice w-5 text-center text-gray-400 transition-colors"></i> Create Bill
+            </a>
+            <a href="/bills" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-list w-5 text-center text-gray-400 transition-colors"></i> Bills History
+            </a>
+            <a href="#" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-chart-simple w-5 text-center text-gray-400 transition-colors"></i> Revenue
+            </a>
+            <a href="#" onclick="setActive(this)" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-xl font-medium text-gray-600">
+                <i class="fa-solid fa-user-group w-5 text-center text-gray-400 transition-colors"></i> Workers
+            </a>
+        </nav>
+
+        <!-- Bottom Actions -->
+        <div class="p-4 border-t border-gray-100">
+            <a href="#" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl font-medium transition duration-200">
+                <i class="fa-solid fa-gear w-5 text-center"></i> Settings
+            </a>
+            <a href="/signup" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-red-50 hover:text-red-600 rounded-xl font-medium transition duration-200">
+                <i class="fa-solid fa-arrow-right-from-bracket w-5 text-center"></i> Log Out
+            </a>
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-1 flex flex-col min-w-0 h-full">
+        
+        <!-- Header -->
+        <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-8 z-10">
+            <!-- Left: Mobile Menu & Search -->
+            <div class="flex items-center gap-4 flex-1">
+                <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-red-500 p-1">
+                    <i class="fa-solid fa-bars text-xl"></i>
+                </button>
+                
+                <div class="relative w-full max-w-md hidden sm:block">
+                    <span class="absolute left-3 top-2.5 text-gray-400">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" placeholder="Search bills or retailers..." class="w-full bg-gray-100 hover:bg-gray-50 focus:bg-white border border-transparent focus:border-red-200 rounded-lg py-2 pl-10 pr-4 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-100">
+                </div>
+            </div>
+
+            <!-- Right: Notifications & Profile -->
+            <div class="flex items-center gap-4 lg:gap-6">
+                <button class="relative text-gray-400 hover:text-red-500 transition p-2 rounded-full hover:bg-gray-50">
+                    <i class="fa-regular fa-bell text-xl"></i>
+                    <span class="absolute top-1.5 right-2 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                </button>
+                
+                <div class="h-8 w-px bg-gray-200 hidden sm:block"></div>
+                
+                <div class="flex items-center gap-3 cursor-pointer p-1 rounded-lg hover:bg-gray-50 transition">
+                    <div class="text-right hidden sm:block">
+                        <p class="text-sm font-bold text-gray-800 leading-none">Admin User</p>
+                        <p class="text-[10px] text-gray-500 font-medium uppercase mt-1">Store Manager</p>
+                    </div>
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-red-100 to-red-200 text-red-600 border border-red-200 flex items-center justify-center font-bold shadow-sm">
+                        AU
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Scrollable Content Area -->
+        <div class="flex-1 overflow-y-auto p-4 lg:p-8">
+            
+            <!-- Page Title -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold text-gray-900">Add New Bill</h2>
+                <p class="text-gray-500 text-sm mt-1">Create a new bill for a retailer with partial or full payment.</p>
+            </div>
+
+            <!-- Main Bill Form Container -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+                <!-- Left: Bill Form -->
+                <div class="lg:col-span-2 space-y-6">
+
+                    <!-- Bill Header Information -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-receipt text-red-500"></i> Bill Information
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Bill Date -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Bill Date <span class="text-red-500">*</span></label>
+                                <input type="date" id="billDate" class="w-full border border-gray-200 rounded-lg py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                            </div>
+
+                            <!-- Bill Title -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Bill Title <span class="text-red-500">*</span></label>
+                                <input type="text" id="billTitle" placeholder="e.g., Monthly Purchase, Special Order" class="w-full border border-gray-200 rounded-lg py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Retailer Information -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-user-tie text-red-500"></i> Retailer Information
+                        </h3>
+                        
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <!-- Retailer Name -->
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Retailer Name <span class="text-red-500">*</span></label>
+                                <input type="text" id="retailerName" placeholder="e.g., Sita Retailers, Gopal Kirana" class="w-full border border-gray-200 rounded-lg py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                            </div>
+
+                            <!-- Contact Number -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Contact Number</label>
+                                <input type="tel" id="contactNumber" placeholder="+977 98xxxxxxxx" class="w-full border border-gray-200 rounded-lg py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                            </div>
+
+                            <!-- Email -->
+                            <div>
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Email</label>
+                                <input type="email" id="email" placeholder="retailer@example.com" class="w-full border border-gray-200 rounded-lg py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                            </div>
+
+                            <!-- Address -->
+                            <div class="sm:col-span-2">
+                                <label class="block text-sm font-semibold text-gray-700 mb-2">Address</label>
+                                <input type="text" id="address" placeholder="Shop address or location" class="w-full border border-gray-200 rounded-lg py-2 px-4 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Items Section -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-800 text-lg flex items-center gap-2">
+                                <i class="fa-solid fa-boxes w-5 text-red-500"></i> Bill Items
+                            </h3>
+                            <span class="text-xs font-semibold text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+                                <span id="itemCount">0</span> Items
+                            </span>
+                        </div>
+                        
+                        <!-- Add Item Form -->
+                        <div class="bg-gray-50 p-4 rounded-lg mb-4 border border-gray-200">
+                            <p class="text-xs font-semibold text-gray-600 mb-3 uppercase">Add New Item</p>
+                            
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-3 mb-3">
+                                <!-- Product Name -->
+                                <div class="sm:col-span-2">
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Product Name <span class="text-red-500">*</span></label>
+                                    <input type="text" id="productName" placeholder="e.g., Rice, Sugar" class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                                </div>
+
+                                <!-- Min Size -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Min Size <span class="text-red-500">*</span></label>
+                                    <input type="number" id="minSize" placeholder="0" min="0" step="0.01" class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                                </div>
+
+                                <!-- Max Size -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Max Size <span class="text-red-500">*</span></label>
+                                    <input type="number" id="maxSize" placeholder="0" min="0" step="0.01" class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                                </div>
+
+                                <!-- Unit -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Unit <span class="text-red-500">*</span></label>
+                                    <select id="unit" class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                                        <option value="">Select Unit</option>
+                                        <option value="kg">Kg</option>
+                                        <option value="ltr">Ltr</option>
+                                        <option value="pcs">Pcs</option>
+                                        <option value="box">Box</option>
+                                        <option value="bag">Bag</option>
+                                    </select>
+                                </div>
+
+                                <!-- Unit Price -->
+                                <div>
+                                    <label class="block text-xs font-semibold text-gray-600 mb-1">Unit Price (Rs) <span class="text-red-500">*</span></label>
+                                    <input type="number" id="unitPrice" placeholder="0" min="0" step="0.01" class="w-full border border-gray-300 rounded-md py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                                </div>
+                            </div>
+
+                            <!-- Add Button -->
+                            <button id="addItemBtn" type="button" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg font-medium text-sm transition active:scale-95">
+                                <i class="fa-solid fa-plus mr-2"></i> Add Item
+                            </button>
+                        </div>
+
+                        <!-- Items List -->
+                        <div id="itemsList" class="space-y-2 max-h-64 overflow-y-auto bg-gray-50 p-3 rounded-lg border-2 border-dashed border-gray-300">
+                            <p class="text-center text-gray-400 text-sm py-6">Items will appear here after adding them</p>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right: Bill Summary & Payment -->
+                <div class="space-y-6">
+
+                    <!-- Bill Summary -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="font-bold text-gray-800 text-lg mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-calculator text-red-500"></i> Bill Summary
+                        </h3>
+
+                        <div class="space-y-3 pb-4 border-b border-gray-200">
+                            <div class="flex justify-between text-sm">
+                                <span class="text-gray-600">Subtotal:</span>
+                                <span class="font-semibold text-gray-800">Rs <span id="subtotal">0.00</span></span>
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700 mb-2 block">Discount (%) <span class="text-gray-400 font-normal">Optional</span></label>
+                                <div class="flex gap-2">
+                                    <input type="number" id="discountPercent" placeholder="0" min="0" max="100" step="0.01" class="flex-1 border border-gray-200 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                                    <input type="text" id="discountAmount" placeholder="Rs 0" readonly class="flex-1 bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 text-sm text-gray-600">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="text-sm font-semibold text-gray-700 mb-2 block">Tax (%) <span class="text-gray-400 font-normal">Optional</span></label>
+                                <div class="flex gap-2">
+                                    <input type="number" id="taxPercent" placeholder="0" min="0" step="0.01" class="flex-1 border border-gray-200 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                                    <input type="text" id="taxAmount" placeholder="Rs 0" readonly class="flex-1 bg-gray-50 border border-gray-200 rounded-lg py-2 px-3 text-sm text-gray-600">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 pb-4 border-b border-gray-200">
+                            <div class="flex justify-between items-center">
+                                <span class="text-lg font-bold text-gray-900">Total Amount:</span>
+                                <span class="text-2xl font-bold text-red-500">Rs <span id="totalAmount">0.00</span></span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Type -->
+                        <div class="py-4">
+                            <label class="text-sm font-semibold text-gray-700 mb-3 block">Payment Type <span class="text-red-500">*</span></label>
+                            <div class="space-y-2">
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" name="paymentType" value="full" checked class="w-4 h-4 text-red-500">
+                                    <span class="text-sm font-medium text-gray-700">Full Payment</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer">
+                                    <input type="radio" name="paymentType" value="partial" class="w-4 h-4 text-red-500">
+                                    <span class="text-sm font-medium text-gray-700">Partial Payment</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Paid Amount (Shows only for partial) -->
+                        <div id="paidAmountDiv" class="py-4 border-t border-gray-200 hidden">
+                            <label class="text-sm font-semibold text-gray-700 mb-2 block">Amount Paid (Rs) <span class="text-red-500">*</span></label>
+                            <input type="number" id="paidAmount" placeholder="0" min="0" step="0.01" class="w-full border border-gray-200 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                            <div class="mt-2 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
+                                <strong>Remaining Balance:</strong> Rs <span id="remainingBalance">0.00</span>
+                            </div>
+                        </div>
+
+                        <!-- Payment Method -->
+                        <div class="py-4">
+                            <label class="text-sm font-semibold text-gray-700 mb-2 block">Payment Method <span class="text-red-500">*</span></label>
+                            <select id="paymentMethod" class="w-full border border-gray-200 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-200">
+                                <option value="">Select Payment Method</option>
+                                <option value="cash">Cash</option>
+                                <option value="card">Card</option>
+                                <option value="upi">UPI</option>
+                                <option value="bank_transfer">Bank Transfer</option>
+                                <option value="cheque">Cheque</option>
+                            </select>
+                        </div>
+
+                        <!-- Notes -->
+                        <div class="py-4">
+                            <label class="text-sm font-semibold text-gray-700 mb-2 block">Additional Notes</label>
+                            <textarea id="notes" placeholder="Add any additional notes or remarks..." class="w-full border border-gray-200 rounded-lg py-2 px-3 text-sm focus:outline-none focus:ring-2 focus:ring-red-200" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-3">
+                        <button id="saveBillBtn" class="w-full bg-red-500 hover:bg-red-600 text-white py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition active:scale-95 shadow-md shadow-red-200">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Bill
+                        </button>
+                        <button id="printBillBtn" class="w-full border border-gray-300 text-gray-700 hover:bg-gray-50 py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition">
+                            <i class="fa-solid fa-print"></i> Print Bill
+                        </button>
+                        <button id="resetBtn" class="w-full text-gray-600 hover:bg-gray-50 py-2 rounded-lg font-medium transition">
+                            <i class="fa-solid fa-arrow-rotate-left mr-2"></i> Clear Form
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </main>
+
+    <!-- JavaScript -->
+    <script src="../assets/Js/bill.js"></script>
+</body>
+</html>
