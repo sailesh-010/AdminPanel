@@ -4,6 +4,10 @@ import userRoutes from './routes/user.routes.js';
 import appDataRoutes from './routes/appData.routes.js';
 import dashboardRoutes from './routes/dashboard.routes.js';
 import productRoutes from './routes/product.routes.js';
+<<<<<<< HEAD
+=======
+import workerRoutes from './routes/worker.routes.js';
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 
 import express from 'express';
 import cors from 'cors';
@@ -18,5 +22,9 @@ app.use('/api/users', userRoutes);
 app.use('/api/app', appDataRoutes);
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/products', productRoutes);
+<<<<<<< HEAD
+=======
+app.use('/api/workers', workerRoutes);
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 
 export default app;

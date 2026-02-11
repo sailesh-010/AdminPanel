@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import express from "express";
 import {
   addProduct,
@@ -68,6 +69,8 @@ router.delete("/:id", deleteProduct);
 router.get('/top-products', getTopProducts);
 
 =======
+=======
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 import express from "express";
 import {
   addProduct,
@@ -136,5 +139,8 @@ router.delete("/:id", deleteProduct);
 // Top selling products
 router.get('/top-products', getTopProducts);
 
+<<<<<<< HEAD
 >>>>>>> 308a3c0 (initial commit)
+=======
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 export default router;

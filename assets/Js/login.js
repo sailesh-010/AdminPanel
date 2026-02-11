@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 document.addEventListener('DOMContentLoaded', function () {
   // Image Slider functionality
   const slides = [
@@ -82,6 +83,8 @@ document.addEventListener('DOMContentLoaded', function () {
     errorMessage.classList.remove('hidden');
   }
 =======
+=======
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 document.addEventListener('DOMContentLoaded', function () {
   // Image Slider functionality
   const slides = [
@@ -164,5 +167,8 @@ document.addEventListener('DOMContentLoaded', function () {
     errorMessage.textContent = message;
     errorMessage.classList.remove('hidden');
   }
+<<<<<<< HEAD
 >>>>>>> 308a3c0 (initial commit)
+=======
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 });

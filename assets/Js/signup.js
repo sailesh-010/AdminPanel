@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 document.addEventListener('DOMContentLoaded', function () {
   const signupForm = document.getElementById('signupForm');
   const errorDiv = document.getElementById('error');
@@ -68,6 +69,8 @@ document.addEventListener('DOMContentLoaded', function () {
     errorDiv.classList.remove('hidden');
   }
 =======
+=======
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 document.addEventListener('DOMContentLoaded', function () {
   const signupForm = document.getElementById('signupForm');
   const errorDiv = document.getElementById('error');
@@ -136,5 +139,8 @@ document.addEventListener('DOMContentLoaded', function () {
     errorDiv.textContent = message;
     errorDiv.classList.remove('hidden');
   }
+<<<<<<< HEAD
 >>>>>>> 308a3c0 (initial commit)
+=======
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 });

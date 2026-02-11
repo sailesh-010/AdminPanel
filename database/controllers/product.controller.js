@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 import { ProductService } from '../services/product.service.js';
 import { DashboardService } from '../services/dashboard.service.js';
 import { supabase, supabaseAdmin } from '../config/Supabase.js';
@@ -250,6 +251,8 @@ export const getTopProducts = async (req, res) => {
     }
   }
 =======
+=======
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 import { ProductService } from '../services/product.service.js';
 import { DashboardService } from '../services/dashboard.service.js';
 import { supabase, supabaseAdmin } from '../config/Supabase.js';
@@ -446,17 +449,33 @@ export const getProductById = async (req, res) => {
 // Update a product
 export const updateProduct = async (req, res) => {
   const { id } = req.params;
+<<<<<<< HEAD
   const { name, category, price, sizeMin, sizeMax, quantity } = req.body;
+=======
+  const { name, price, sizeMin, sizeMax, quantity } = req.body;
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 
   try {
     const productData = {
         name,
+<<<<<<< HEAD
         category,
         price,
         size_min: sizeMin,
         size_max: sizeMax,
         quantity,
     };
+=======
+        price: parseFloat(price),
+        min_size: sizeMin !== undefined ? parseFloat(sizeMin) : undefined,
+        max_size: sizeMax !== undefined ? parseFloat(sizeMax) : undefined,
+        stock_quantity: quantity !== undefined ? parseInt(quantity) : undefined,
+    };
+    
+    // Remove undefined values
+    Object.keys(productData).forEach(key => productData[key] === undefined && delete productData[key]);
+    
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     const updatedProduct = await ProductService.updateProduct(req.tenant_id, id, productData);
 
     res.json({
@@ -464,6 +483,10 @@ export const updateProduct = async (req, res) => {
       product: updatedProduct
     });
   } catch (err) {
+<<<<<<< HEAD
+=======
+    console.error('Update product error:', err);
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     res.status(500).json({ error: err.message });
   }
 };
@@ -500,4 +523,7 @@ export const getTopProducts = async (req, res) => {
       });
     }
   }
+<<<<<<< HEAD
 >>>>>>> 308a3c0 (initial commit)
+=======
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3

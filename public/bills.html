@@ -3,7 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>Bills History - JHA SYSTEM</title>
+=======
+    <title>Jha System - Bills History</title>
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -41,11 +45,32 @@
         .sidebar-link.active i {
             color: #1e40af;
         }
+<<<<<<< HEAD
+=======
+
+        .active-bill-type {
+            background-color: #E53935;
+            color: white;
+            box-shadow: 0 2px 4px rgba(229, 57, 53, 0.2);
+        }
+
+        #buyBillsBtn {
+            background-color: transparent;
+            color: #666;
+        }
+
+        #buyBillsBtn.active-bill-type {
+            background-color: #2563eb;
+            color: white;
+            box-shadow: 0 2px 4px rgba(37, 99, 235, 0.2);
+        }
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     </style>
 </head>
 <body class="bg-gray-50">
 
     <div class="flex flex-col lg:flex-row min-h-screen">
+<<<<<<< HEAD
         <!-- Sidebar -->
         <aside id="sidebar" class="fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 flex flex-col h-full shadow-xl lg:shadow-none">
             
@@ -103,15 +128,37 @@
                 </a>
             </div>
         </aside>
+=======
+        <!-- Sidebar Container -->
+        <div id="sidebar-container"></div>
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 
         <!-- Main Content -->
         <main class="flex-1 overflow-auto">
             <div class="p-6 lg:p-8">
                 <div class="max-w-7xl mx-auto">
                     <!-- Header -->
+<<<<<<< HEAD
                     <div class="mb-8">
                         <h2 class="text-3xl font-bold text-gray-800 mb-2">Bills History</h2>
                         <p class="text-gray-600">View, search, and manage all your bills</p>
+=======
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                        <div>
+                            <h2 class="text-3xl font-bold text-gray-800 mb-2">Bills History</h2>
+                            <p class="text-gray-600">View, search, and manage all your bills</p>
+                        </div>
+                        
+                        <!-- Bill Type Toggle -->
+                        <div class="flex items-center gap-2 bg-white p-1 rounded-lg border border-gray-300 w-fit">
+                            <button id="sellBillsBtn" class="px-4 py-2 rounded-md font-medium transition active-bill-type" onclick="switchBillType('sell')">
+                                <i class="fa-solid fa-arrow-up-right-dots mr-2"></i> Sell
+                            </button>
+                            <button id="buyBillsBtn" class="px-4 py-2 rounded-md font-medium transition" onclick="switchBillType('buy')">
+                                <i class="fa-solid fa-arrow-down-left-dots mr-2"></i> Buy
+                            </button>
+                        </div>
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
                     </div>
 
                     <!-- Search and Filter Section -->
@@ -228,6 +275,7 @@
         </div>
     </div>
 
+<<<<<<< HEAD
     <script>
         function setActive(element) {
             const links = document.querySelectorAll('.sidebar-link');
@@ -237,5 +285,12 @@
     </script>
 
     <script src="../assets/Js/bills.js"></script>
+=======
+    <script src="/assets/Js/components/sidebar.js"></script>
+    <script src="/assets/Js/bills.js"></script>
+    <script>
+        initSidebar('bills');
+    </script>
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 </body>
 </html>

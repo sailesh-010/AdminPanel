@@ -1,4 +1,5 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -316,12 +317,18 @@
 
 
 =======
+=======
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<<<<<<< HEAD
     <title>Jha System - Retail Dashboard</title>
+=======
+    <title>Jha System - Add Items</title>
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -379,6 +386,7 @@
 </head>
 <body class="bg-gray-50 text-gray-800 h-screen overflow-hidden flex">
 
+<<<<<<< HEAD
     <!-- Mobile Sidebar Overlay -->
     <div id="sidebarOverlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden lg:hidden"></div>
 
@@ -439,6 +447,10 @@
             </a>
         </div>
     </aside>
+=======
+    <!-- Sidebar Container - Populated by JS Component -->
+    <div id="sidebar-container"></div>
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 
     <!-- MAIN CONTENT -->
     <main class="flex-1 flex flex-col min-w-0 h-full">
@@ -642,7 +654,19 @@
 
 </body>
 
+<<<<<<< HEAD
 <script src="/assets/Js/add-product.js"></script>
 
 >>>>>>> 308a3c0 (initial commit)
+=======
+<script src="/assets/Js/components/sidebar.js"></script>
+<script src="/assets/Js/add-product.js"></script>
+<script>
+    // Initialize sidebar with active page
+    document.addEventListener('DOMContentLoaded', function() {
+        initSidebar('add-product');
+    });
+</script>
+
+>>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 </html>
