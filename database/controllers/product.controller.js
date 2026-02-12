@@ -1,5 +1,3 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { ProductService } from '../services/product.service.js';
 import { DashboardService } from '../services/dashboard.service.js';
 import { supabase, supabaseAdmin } from '../config/Supabase.js';
@@ -19,11 +17,11 @@ export const addProduct = async (req, res) => {
 
     // Basic validation
     if (!name || !categoryId || !price || minSize === undefined || maxSize === undefined) {
-      return res.status(400).json({ error: "Required fields are missing." });
+      return res.status(400).json({ error: 'Required fields are missing.' });
     }
 
     if (minSize > maxSize) {
-      return res.status(400).json({ error: "minSize cannot be greater than maxSize." });
+      return res.status(400).json({ error: 'minSize cannot be greater than maxSize.' });
     }
 
     // Fetch category ID from the category name
@@ -70,13 +68,12 @@ export const addProduct = async (req, res) => {
     console.log('✅ Product added successfully:', newProduct);
 
     res.status(201).json({
-      message: "Product added successfully",
+      message: 'Product added successfully',
       product: newProduct,
     });
-
   } catch (err) {
-    console.error("❌ Failed to add product:", err);
-    res.status(500).json({ error: "Failed to add product. " + err.message });
+    console.error('❌ Failed to add product:', err);
+    res.status(500).json({ error: 'Failed to add product. ' + err.message });
   }
 };
 
@@ -88,7 +85,7 @@ export const getCategories = async (req, res) => {
     console.log(`🏢 Tenant ID from middleware: ${tenantId}`);
 
     if (!tenantId) {
-      return res.status(401).json({ error: "Tenant ID not found" });
+      return res.status(401).json({ error: 'Tenant ID not found' });
     }
 
     // Get the tenant's shop_type_id
@@ -144,7 +141,7 @@ export const getAllProducts = async (req, res) => {
     const { products, total } = await ProductService.getAllProducts(req.tenant_id, page, limit);
 
     res.json({
-      message: "Products retrieved successfully",
+      message: 'Products retrieved successfully',
       products: products || [],
       total,
       page,
@@ -157,247 +154,13 @@ export const getAllProducts = async (req, res) => {
 
 // Search products
 export const searchProducts = async (req, res) => {
-    const { page = 1, limit = 10, name, category, inStock } = req.query;
-    const filters = { name, category, inStock: inStock === 'true' };
-
-    try {
-        const { products, total } = await ProductService.searchProducts(req.tenant_id, filters, page, limit);
-        res.json({
-            message: "Products retrieved successfully",
-            products: products || [],
-            total,
-            page,
-            limit
-        });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
-
-// Get a single product by ID
-export const getProductById = async (req, res) => {
-  const { id } = req.params;
+  const { page = 1, limit = 10, name, category, inStock } = req.query;
+  const filters = { name, category, inStock: inStock === 'true' };
 
   try {
-    const product = await ProductService.getProductById(req.tenant_id, id);
-    if (!product) {
-        return res.status(404).json({ error: "Product not found" });
-    }
-
+    const { products, total } = await ProductService.searchProducts(req.tenant_id, filters, page, limit);
     res.json({
-      message: "Product retrieved successfully",
-      product: product
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Update a product
-export const updateProduct = async (req, res) => {
-  const { id } = req.params;
-  const { name, category, price, sizeMin, sizeMax, quantity } = req.body;
-
-  try {
-    const productData = {
-        name,
-        category,
-        price,
-        size_min: sizeMin,
-        size_max: sizeMax,
-        quantity,
-    };
-    const updatedProduct = await ProductService.updateProduct(req.tenant_id, id, productData);
-
-    res.json({
-      message: "Product updated successfully",
-      product: updatedProduct
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Delete a product
-export const deleteProduct = async (req, res) => {
-  const { id } = req.params;
-
-  try {
-    await ProductService.deleteProduct(req.tenant_id, id);
-    res.json({ message: "Product deleted successfully" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-};
-
-// Get top selling products
-export const getTopProducts = async (req, res) => {
-    try {
-      const tenantId = req.tenant_id;
-      const limit = parseInt(req.query.limit) || 5;
-      
-      const topProducts = await DashboardService.getTopProducts(tenantId, limit);
-      
-      res.json({
-        success: true,
-        data: topProducts
-      });
-    } catch (error) {
-      console.error('Top products error:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: 'Failed to fetch top products' 
-      });
-    }
-  }
-=======
-=======
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
-import { ProductService } from '../services/product.service.js';
-import { DashboardService } from '../services/dashboard.service.js';
-import { supabase, supabaseAdmin } from '../config/Supabase.js';
-
-// Add products
-export const addProduct = async (req, res) => {
-  try {
-    const { name, categoryId, price, minSize, maxSize, numberOfSets, stockQuantity } = req.body;
-    const tenantId = req.tenant_id;
-
-    console.log('📝 Adding product:', { name, categoryId, price, minSize, maxSize, numberOfSets, stockQuantity, tenantId });
-
-    // Fail fast: check tenant_id exists
-    if (!tenantId) {
-      return res.status(401).json({ error: 'Unauthorized: tenant_id missing from token' });
-    }
-
-    // Basic validation
-    if (!name || !categoryId || !price || minSize === undefined || maxSize === undefined) {
-      return res.status(400).json({ error: "Required fields are missing." });
-    }
-
-    if (minSize > maxSize) {
-      return res.status(400).json({ error: "minSize cannot be greater than maxSize." });
-    }
-
-    // Fetch category ID from the category name
-    const { data: category, error: categoryError } = await supabase
-      .from('categories')
-      .select('id')
-      .eq('name', categoryId)
-      .single();
-
-    console.log('🏷️ Category lookup:', { category, categoryError });
-
-    if (categoryError || !category) {
-      console.error('Category lookup error:', categoryError);
-      return res.status(400).json({ error: `Invalid category: '${categoryId}'.` });
-    }
-
-    const categoryDbId = category.id;
-
-    // Prepare product data matching the table schema
-    const productData = {
-      tenant_id: tenantId,
-      category_id: categoryDbId,
-      name,
-      price: parseFloat(price),
-      stock_quantity: parseInt(stockQuantity) || 0,
-      min_size: parseInt(minSize),
-      max_size: parseInt(maxSize),
-      created_at: new Date().toISOString(),
-    };
-
-    console.log('💾 Inserting product:', productData);
-
-    const { data: newProduct, error: insertError } = await supabase
-      .from('products')
-      .insert([productData])
-      .select()
-      .single();
-
-    if (insertError) {
-      console.error('Insert error:', insertError);
-      throw insertError;
-    }
-
-    console.log('✅ Product added successfully:', newProduct);
-
-    res.status(201).json({
-      message: "Product added successfully",
-      product: newProduct,
-    });
-
-  } catch (err) {
-    console.error("❌ Failed to add product:", err);
-    res.status(500).json({ error: "Failed to add product. " + err.message });
-  }
-};
-
-// Get product categories
-export const getCategories = async (req, res) => {
-  try {
-    const tenantId = req.tenant_id;
-    
-    console.log(`🏢 Tenant ID from middleware: ${tenantId}`);
-
-    if (!tenantId) {
-      return res.status(401).json({ error: "Tenant ID not found" });
-    }
-
-    // Get the tenant's shop_type_id
-    const { data: tenant, error: tError } = await supabase
-      .from('tenants')
-      .select('shop_type_id')
-      .eq('id', tenantId)
-      .single();
-
-    console.log('🏪 Tenant query result:', { tenant, tError });
-
-    if (tError || !tenant?.shop_type_id) {
-      console.log('⚠️ No shop_type_id found, returning all categories');
-      
-      // Fallback: return all categories
-      const { data: categories, error: cError } = await supabase
-        .from('categories')
-        .select('name')
-        .order('name', { ascending: true });
-
-      if (cError) throw cError;
-      console.log(`✅ Found ${categories.length} categories (all):`, categories);
-      return res.status(200).json(categories.map(c => c.name));
-    }
-
-    const shopTypeId = tenant.shop_type_id;
-    console.log(`🏪 Shop Type ID: ${shopTypeId}`);
-
-    // Fetch categories for this shop type
-    const { data: categories, error: cError } = await supabase
-      .from('categories')
-      .select('name')
-      .eq('shop_type_id', shopTypeId)
-      .order('name', { ascending: true });
-
-    if (cError) {
-      console.error('❌ Categories error:', cError);
-      throw cError;
-    }
-
-    console.log(`✅ Found ${categories.length} categories (filtered):`, categories);
-    return res.status(200).json(categories.map(c => c.name));
-  } catch (error) {
-    console.error('❌ Get categories error:', error);
-    return res.status(500).json({ error: error.message });
-  }
-};
-
-// Get all products
-export const getAllProducts = async (req, res) => {
-  try {
-    const { page = 1, limit = 10 } = req.query;
-    const { products, total } = await ProductService.getAllProducts(req.tenant_id, page, limit);
-
-    res.json({
-      message: "Products retrieved successfully",
+      message: 'Products retrieved successfully',
       products: products || [],
       total,
       page,
@@ -408,25 +171,6 @@ export const getAllProducts = async (req, res) => {
   }
 };
 
-// Search products
-export const searchProducts = async (req, res) => {
-    const { page = 1, limit = 10, name, category, inStock } = req.query;
-    const filters = { name, category, inStock: inStock === 'true' };
-
-    try {
-        const { products, total } = await ProductService.searchProducts(req.tenant_id, filters, page, limit);
-        res.json({
-            message: "Products retrieved successfully",
-            products: products || [],
-            total,
-            page,
-            limit
-        });
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-};
-
 // Get a single product by ID
 export const getProductById = async (req, res) => {
   const { id } = req.params;
@@ -434,11 +178,11 @@ export const getProductById = async (req, res) => {
   try {
     const product = await ProductService.getProductById(req.tenant_id, id);
     if (!product) {
-        return res.status(404).json({ error: "Product not found" });
+      return res.status(404).json({ error: 'Product not found' });
     }
 
     res.json({
-      message: "Product retrieved successfully",
+      message: 'Product retrieved successfully',
       product: product
     });
   } catch (err) {
@@ -449,44 +193,28 @@ export const getProductById = async (req, res) => {
 // Update a product
 export const updateProduct = async (req, res) => {
   const { id } = req.params;
-<<<<<<< HEAD
-  const { name, category, price, sizeMin, sizeMax, quantity } = req.body;
-=======
   const { name, price, sizeMin, sizeMax, quantity } = req.body;
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 
   try {
     const productData = {
-        name,
-<<<<<<< HEAD
-        category,
-        price,
-        size_min: sizeMin,
-        size_max: sizeMax,
-        quantity,
+      name,
+      price: parseFloat(price),
+      min_size: sizeMin !== undefined ? parseFloat(sizeMin) : undefined,
+      max_size: sizeMax !== undefined ? parseFloat(sizeMax) : undefined,
+      stock_quantity: quantity !== undefined ? parseInt(quantity) : undefined,
     };
-=======
-        price: parseFloat(price),
-        min_size: sizeMin !== undefined ? parseFloat(sizeMin) : undefined,
-        max_size: sizeMax !== undefined ? parseFloat(sizeMax) : undefined,
-        stock_quantity: quantity !== undefined ? parseInt(quantity) : undefined,
-    };
-    
+
     // Remove undefined values
     Object.keys(productData).forEach(key => productData[key] === undefined && delete productData[key]);
-    
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
+
     const updatedProduct = await ProductService.updateProduct(req.tenant_id, id, productData);
 
     res.json({
-      message: "Product updated successfully",
+      message: 'Product updated successfully',
       product: updatedProduct
     });
   } catch (err) {
-<<<<<<< HEAD
-=======
     console.error('Update product error:', err);
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     res.status(500).json({ error: err.message });
   }
 };
@@ -497,7 +225,7 @@ export const deleteProduct = async (req, res) => {
 
   try {
     await ProductService.deleteProduct(req.tenant_id, id);
-    res.json({ message: "Product deleted successfully" });
+    res.json({ message: 'Product deleted successfully' });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -505,25 +233,21 @@ export const deleteProduct = async (req, res) => {
 
 // Get top selling products
 export const getTopProducts = async (req, res) => {
-    try {
-      const tenantId = req.tenant_id;
-      const limit = parseInt(req.query.limit) || 5;
-      
-      const topProducts = await DashboardService.getTopProducts(tenantId, limit);
-      
-      res.json({
-        success: true,
-        data: topProducts
-      });
-    } catch (error) {
-      console.error('Top products error:', error);
-      res.status(500).json({ 
-        success: false, 
-        error: 'Failed to fetch top products' 
-      });
-    }
+  try {
+    const tenantId = req.tenant_id;
+    const limit = parseInt(req.query.limit) || 5;
+    
+    const topProducts = await DashboardService.getTopProducts(tenantId, limit);
+    
+    res.json({
+      success: true,
+      data: topProducts
+    });
+  } catch (error) {
+    console.error('Top products error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: 'Failed to fetch top products' 
+    });
   }
-<<<<<<< HEAD
->>>>>>> 308a3c0 (initial commit)
-=======
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
+};

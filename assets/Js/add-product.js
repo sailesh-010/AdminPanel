@@ -13,9 +13,6 @@ function setActive(element) {
     });
     element.classList.add('active');
 }
-
-<<<<<<< HEAD
-=======
 // ========== MULTIPLE PRODUCT FORMS ==========
 let currentProductCount = 1;
 
@@ -192,8 +189,6 @@ function generateProductForms(count) {
     fetchCategoriesForAllForms();
     attachFormHandlers();
 }
-
->>>>>>> 308a3c0 (initial commit)
 // Fetch categories
 async function fetchCategories() {
     try {
@@ -201,12 +196,7 @@ async function fetchCategories() {
         
         if (!token) {
             console.error('❌ No token found in localStorage');
-<<<<<<< HEAD
-            updateCategoryDropdown(['No categories available']);
-            return;
-=======
             return ['No categories available'];
->>>>>>> 308a3c0 (initial commit)
         }
         
         console.log('📡 Fetching categories with token...');
@@ -224,58 +214,21 @@ async function fetchCategories() {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('❌ Failed to fetch categories:', response.status, errorText);
-<<<<<<< HEAD
-            updateCategoryDropdown(['Error loading categories']);
-            return;
-=======
             return ['Error loading categories'];
->>>>>>> 308a3c0 (initial commit)
         }
 
         const result = await response.json();
         console.log('✅ Categories response:', result);
         
-<<<<<<< HEAD
-        // Handle both { data: [...] } and direct array responses
-=======
->>>>>>> 308a3c0 (initial commit)
         const categories = result.data || result;
         
         if (!Array.isArray(categories)) {
             console.error('❌ Categories is not an array:', categories);
-<<<<<<< HEAD
-            updateCategoryDropdown(['Invalid response format']);
-            return;
-=======
             return ['Invalid response format'];
->>>>>>> 308a3c0 (initial commit)
         }
 
         if (categories.length === 0) {
             console.warn('⚠️ No categories found for this tenant');
-<<<<<<< HEAD
-            updateCategoryDropdown(['No categories available']);
-            return;
-        }
-
-        console.log(`✅ Loaded ${categories.length} categories:`, categories);
-        updateCategoryDropdown(categories);
-        
-    } catch (error) {
-        console.error('🔴 Error fetching categories:', error);
-        updateCategoryDropdown(['Error: ' + error.message]);
-    }
-}
-
-// Helper function to update dropdown
-function updateCategoryDropdown(categories) {
-    const select = document.getElementById('productCategory');
-    
-    // Clear all options
-    select.innerHTML = '';
-    
-    // Add default option
-=======
             return ['No categories available'];
         }
 
@@ -301,16 +254,11 @@ async function fetchCategoriesForAllForms() {
 function updateCategoryDropdown(select, categories) {
     select.innerHTML = '';
     
->>>>>>> 308a3c0 (initial commit)
     const defaultOption = document.createElement('option');
     defaultOption.value = '';
     defaultOption.textContent = 'Select Category';
     select.appendChild(defaultOption);
     
-<<<<<<< HEAD
-    // Add categories
-=======
->>>>>>> 308a3c0 (initial commit)
     categories.forEach(category => {
         const option = document.createElement('option');
         option.value = category;
@@ -318,108 +266,6 @@ function updateCategoryDropdown(select, categories) {
         select.appendChild(option);
     });
 }
-
-<<<<<<< HEAD
-// Load categories when the page loads
-window.addEventListener('DOMContentLoaded', fetchCategories);
-
-// Add Product Form Handler
-document.addEventListener('DOMContentLoaded', () => {
-    const form = document.getElementById('addProductForm');
-    if (!form) return;
-
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
-
-        const successMessage = document.getElementById('successMessage');
-        const errorMessage = document.getElementById('errorMessage');
-        const submitBtn = e.target.querySelector('button[type="submit"]');
-        
-        const formData = {
-            name: document.getElementById('productName').value.trim(),
-            categoryId: document.getElementById('productCategory').value.trim(),
-            price: parseFloat(document.getElementById('productPrice').value),
-            minSize: parseFloat(document.getElementById('sizeMin').value),
-            maxSize: parseFloat(document.getElementById('sizeMax').value),
-            stockQuantity: parseInt(document.getElementById('productQuantity').value)
-        };
-
-        // Validation
-        if (!formData.name) {
-            showError(errorMessage, successMessage, 'Product name is required');
-            return;
-        }
-
-        if (!formData.categoryId) {
-            showError(errorMessage, successMessage, 'Category is required');
-            return;
-        }
-
-        if (formData.price <= 0) {
-            showError(errorMessage, successMessage, 'Price must be greater than 0');
-            return;
-        }
-
-        if (formData.minSize < 0 || formData.maxSize < 0) {
-            showError(errorMessage, successMessage, 'Size cannot be negative');
-            return;
-        }
-
-        if (formData.minSize > formData.maxSize) {
-            showError(errorMessage, successMessage, 'Minimum size cannot be greater than maximum size');
-            return;
-        }
-
-        if (formData.numberOfSets <= 0) {
-            showError(errorMessage, successMessage, 'Quantity must be at least 1');
-            return;
-        }
-
-        // Disable button during submission
-        submitBtn.disabled = true;
-        submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin mr-2"></i> Adding...';
-
-        try {
-            const token = localStorage.getItem('token');
-            console.log('📤 Submitting product:', formData);
-            
-            // Send data to server
-            const response = await fetch('/api/products/add', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: JSON.stringify(formData)
-            });
-
-            const data = await response.json();
-            console.log('📥 Response:', data);
-            
-            if (response.ok) {
-                showSuccess(errorMessage, successMessage);
-                document.getElementById('addProductForm').reset();
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Add Product';
-
-                // Redirect to dashboard
-                setTimeout(() => {
-                    window.location.href = '/dashboard';
-                }, 1500);
-            } else {
-                showError(errorMessage, successMessage, data.error || 'Failed to add product');
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Add Product';
-            }
-        } catch (error) {
-            console.error('🔴 Error:', error);
-            showError(errorMessage, successMessage, 'Error: ' + error.message);
-            submitBtn.disabled = false;
-            submitBtn.innerHTML = '<i class="fa-solid fa-check mr-2"></i> Add Product';
-        }
-    });
-});
-=======
 // Attach form handlers to all forms
 function attachFormHandlers() {
     document.querySelectorAll('.addProductForm').forEach((form, index) => {
@@ -436,7 +282,7 @@ function attachFormHandlers() {
                 price: parseFloat(form.querySelector('.productPrice').value),
                 minSize: parseFloat(form.querySelector('.sizeMin').value),
                 maxSize: parseFloat(form.querySelector('.sizeMax').value),
-                stockQuantity: parseInt(form.querySelector('.productQuantity').value)
+                stockQuantity: parseInt(form.querySelector('.productQuantity').value, 10)
             };
 
             // Validation
@@ -465,7 +311,7 @@ function attachFormHandlers() {
                 return;
             }
 
-            if (formData.stockQuantity <= 0) {
+            if (!formData.stockQuantity || formData.stockQuantity <= 0) {
                 showError(errorMessage, successMessage, 'Quantity must be at least 1');
                 return;
             }
@@ -512,7 +358,6 @@ function attachFormHandlers() {
         });
     });
 }
->>>>>>> 308a3c0 (initial commit)
 
 function showSuccess(errorMsg, successMsg) {
     successMsg.classList.remove('hidden');
@@ -524,11 +369,8 @@ function showError(errorMsg, successMsg, message) {
     errorMsg.classList.remove('hidden');
     successMsg.classList.add('hidden');
 }
-<<<<<<< HEAD
-=======
 
 // Initialize on page load
 window.addEventListener('DOMContentLoaded', () => {
     generateProductForms(1);
 });
->>>>>>> 308a3c0 (initial commit)

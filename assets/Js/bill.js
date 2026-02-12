@@ -19,10 +19,7 @@ function setActive(element) {
 
 // Initialize
 let billItems = [];
-<<<<<<< HEAD
-=======
 let billMode = 'sell'; // 'sell' or 'buy'
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 
 document.addEventListener('DOMContentLoaded', function() {
     // Set current date
@@ -39,8 +36,6 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
 });
 
-<<<<<<< HEAD
-=======
 // Switch Bill Mode (Sell or Buy)
 function switchBillMode(mode) {
     try {
@@ -79,21 +74,13 @@ function switchBillMode(mode) {
         alert('Error switching bill mode. Please refresh the page.');
     }
 }
-
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 // Setup Event Listeners
 function setupEventListeners() {
     // Add Item Button
     document.getElementById('addItemBtn').addEventListener('click', addItem);
 
-<<<<<<< HEAD
-    // Discount and Tax calculation
-    document.getElementById('discountPercent').addEventListener('change', updateCalculations);
-    document.getElementById('taxPercent').addEventListener('change', updateCalculations);
-=======
     // Discount calculation
     document.getElementById('discountPercent').addEventListener('change', updateCalculations);
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 
     // Payment Type Change
     document.querySelectorAll('input[name="paymentType"]').forEach(radio => {
@@ -207,26 +194,12 @@ function updateCalculations() {
     const discountPercent = parseFloat(document.getElementById('discountPercent').value) || 0;
     const discountAmount = (subtotal * discountPercent) / 100;
 
-<<<<<<< HEAD
-    // Get tax
-    const taxPercent = parseFloat(document.getElementById('taxPercent').value) || 0;
-    const taxBase = subtotal - discountAmount;
-    const taxAmount = (taxBase * taxPercent) / 100;
-
-    // Calculate total
-    const totalAmount = subtotal - discountAmount + taxAmount;
-=======
     // Calculate total (without tax)
     const totalAmount = subtotal - discountAmount;
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 
     // Update UI
     document.getElementById('subtotal').textContent = subtotal.toFixed(2);
     document.getElementById('discountAmount').value = `Rs ${discountAmount.toFixed(2)}`;
-<<<<<<< HEAD
-    document.getElementById('taxAmount').value = `Rs ${taxAmount.toFixed(2)}`;
-=======
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     document.getElementById('totalAmount').textContent = totalAmount.toFixed(2);
 
     // Update remaining balance if partial payment
@@ -297,11 +270,6 @@ function saveBill() {
         subtotal: parseFloat(document.getElementById('subtotal').textContent),
         discountPercent: parseFloat(document.getElementById('discountPercent').value) || 0,
         discountAmount: parseFloat(document.getElementById('discountAmount').value.replace('Rs ', '')),
-<<<<<<< HEAD
-        taxPercent: parseFloat(document.getElementById('taxPercent').value) || 0,
-        taxAmount: parseFloat(document.getElementById('taxAmount').value.replace('Rs ', '')),
-=======
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
         totalAmount: parseFloat(document.getElementById('totalAmount').textContent),
         paymentType,
         paidAmount: paymentType === 'partial' ? parseFloat(document.getElementById('paidAmount').value) : parseFloat(document.getElementById('totalAmount').textContent),
@@ -309,10 +277,7 @@ function saveBill() {
         paymentMethod,
         notes: document.getElementById('notes').value,
         createdAt: new Date().toISOString(),
-<<<<<<< HEAD
-=======
         billMode: billMode, // Add bill mode (sell or buy)
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
         paymentHistory: paymentType === 'partial' ? [
             {
                 date: new Date().toISOString().split('T')[0],
@@ -322,22 +287,14 @@ function saveBill() {
         ] : []
     };
 
-<<<<<<< HEAD
-    // Save to localStorage (for demo)
-=======
     // Save to localStorage based on bill mode
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     let bills = JSON.parse(localStorage.getItem('bills')) || [];
     bills.push(billData);
     localStorage.setItem('bills', JSON.stringify(bills));
 
     // Show success message
-<<<<<<< HEAD
-    alert(`✓ Bill saved successfully!\n\nRetailer: ${retailerName}\nTotal: Rs ${billData.totalAmount.toFixed(2)}\nPayment Type: ${paymentType === 'full' ? 'Full Payment' : 'Partial Payment'}`);
-=======
     const partyType = billMode === 'sell' ? 'Retailer' : 'Supplier/Vendor';
     alert(`✓ Bill saved successfully!\n\n${partyType}: ${retailerName}\nTotal: Rs ${billData.totalAmount.toFixed(2)}\nPayment Type: ${paymentType === 'full' ? 'Full Payment' : 'Partial Payment'}`);
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 
     // Reset form
     resetForm();
@@ -355,10 +312,6 @@ function printBill() {
     const billDate = document.getElementById('billDate').value;
     const subtotal = document.getElementById('subtotal').textContent;
     const discountAmount = document.getElementById('discountAmount').value;
-<<<<<<< HEAD
-    const taxAmount = document.getElementById('taxAmount').value;
-=======
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     const totalAmount = document.getElementById('totalAmount').textContent;
     const paymentType = document.querySelector('input[name="paymentType"]:checked').value;
     const paymentMethod = document.getElementById('paymentMethod').value;
@@ -446,10 +399,6 @@ function printBill() {
             <div class="summary">
                 <p><span>Subtotal:</span> <span>Rs ${subtotal}</span></p>
                 <p><span>Discount:</span> <span>${discountAmount}</span></p>
-<<<<<<< HEAD
-                <p><span>Tax:</span> <span>${taxAmount}</span></p>
-=======
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
                 <p class="total"><span>Total:</span> <span>Rs ${totalAmount}</span></p>
                 ${paidInfo}
             </div>
@@ -486,10 +435,6 @@ function resetForm() {
 
     // Reset numbers
     document.getElementById('discountPercent').value = '';
-<<<<<<< HEAD
-    document.getElementById('taxPercent').value = '';
-=======
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     document.getElementById('paidAmount').value = '';
     document.querySelector('input[name="paymentType"][value="full"]').checked = true;
     document.getElementById('paymentMethod').value = '';
@@ -497,10 +442,6 @@ function resetForm() {
     // Reset calculations
     document.getElementById('subtotal').textContent = '0.00';
     document.getElementById('discountAmount').value = 'Rs 0.00';
-<<<<<<< HEAD
-    document.getElementById('taxAmount').value = 'Rs 0.00';
-=======
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     document.getElementById('totalAmount').textContent = '0.00';
     document.getElementById('remainingBalance').textContent = '0.00';
 
@@ -514,9 +455,6 @@ function resetForm() {
     // Focus on retailer name
     document.getElementById('retailerName').focus();
 }
-<<<<<<< HEAD
-=======
-
 // Clear form for mode switching
 function clearBillForm() {
     try {
@@ -584,4 +522,3 @@ function clearBillForm() {
         console.error('Error in clearBillForm:', error);
     }
 }
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3

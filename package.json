@@ -1,7 +1,6 @@
 {
   "name": "admin-panel",
   "version": "1.0.0",
-  "description": "",
   "main": "server.js",
   "type": "module",
   "scripts": {
@@ -23,5 +22,15 @@
     "mongoose": "^9.1.5",
     "nodemon": "^3.1.11",
     "postgres": "^3.4.8"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sailesh-010/AdminPanel.git"
+  },
+  "bugs": {
+    "url": "https://github.com/sailesh-010/AdminPanel/issues"
+  },
+  "homepage": "https://github.com/sailesh-010/AdminPanel#readme",
+  "description": ""
 }

@@ -1,20 +1,3 @@
-<<<<<<< HEAD
-// Sidebar Toggle for Mobile
-const sidebar = document.getElementById('sidebar');
-const overlay = document.getElementById('sidebarOverlay');
-
-function toggleSidebar() {
-    sidebar.classList.toggle('-translate-x-full');
-    overlay.classList.toggle('hidden');
-}
-
-// Active Link Handler
-function setActive(element) {
-    document.querySelectorAll('.sidebar-link').forEach(link => {
-        link.classList.remove('active');
-    });
-    element.classList.add('active');
-=======
 // Sale Management JavaScript
 const API_BASE = '/api';
 let saleItems = [];
@@ -434,20 +417,12 @@ function openViewModal(saleId) {
 function closeViewModal() {
     document.getElementById('viewSaleModal').classList.add('hidden');
     document.body.style.overflow = '';
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 }
 
 // New Sale Button Handler
 const newSaleBtn = document.getElementById('newSaleBtn');
 if (newSaleBtn) {
-<<<<<<< HEAD
-    newSaleBtn.addEventListener('click', function() {
-        // You can replace this with actual implementation
-        alert('New Sale form will open here');
-    });
-=======
     newSaleBtn.addEventListener('click', openSaleModal);
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 }
 
 // Search functionality for sales
@@ -458,13 +433,8 @@ if (saleSearchInput) {
         const tableRows = document.querySelectorAll('#sale-table tbody tr');
         
         tableRows.forEach(row => {
-<<<<<<< HEAD
-            const saleId = row.cells[0].textContent.toLowerCase();
-            const customer = row.cells[1].textContent.toLowerCase();
-=======
             const saleId = row.cells[0]?.textContent.toLowerCase() || '';
             const customer = row.cells[1]?.textContent.toLowerCase() || '';
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
             
             if (saleId.includes(searchTerm) || customer.includes(searchTerm)) {
                 row.style.display = '';
@@ -531,24 +501,14 @@ document.addEventListener('click', function(e) {
     if (e.target.closest('button[title="View Details"]')) {
         const row = e.target.closest('tr');
         const saleId = row.cells[0].textContent.trim();
-<<<<<<< HEAD
-        alert(`Viewing details for ${saleId}`);
-        // In a real application, open a modal or navigate to details page
-=======
         openViewModal(saleId);
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     }
     
     // Edit
     if (e.target.closest('button[title="Edit"]')) {
         const row = e.target.closest('tr');
         const saleId = row.cells[0].textContent.trim();
-<<<<<<< HEAD
-        alert(`Editing ${saleId}`);
-        // In a real application, open an edit modal
-=======
         alert(`Edit functionality for ${saleId} - Coming soon!`);
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
     }
     
     // Delete
@@ -558,24 +518,9 @@ document.addEventListener('click', function(e) {
         if (confirm(`Are you sure you want to delete ${saleId}?`)) {
             row.remove();
             alert(`${saleId} deleted successfully`);
-<<<<<<< HEAD
-            // In a real application, send a DELETE request to the server
-=======
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
         }
     }
 });
-
-<<<<<<< HEAD
-// Initialize page
-document.addEventListener('DOMContentLoaded', function() {
-    // Set the Sale link as active
-    const saleLink = document.querySelector('a[href="/sale"]');
-    if (saleLink) {
-        setActive(saleLink);
-    }
-});
-=======
 // Close modal on Escape key
 document.addEventListener('keydown', function(e) {
     if (e.key === 'Escape') {
@@ -589,4 +534,3 @@ document.addEventListener('DOMContentLoaded', function() {
     // Load products on page load
     fetchProducts();
 });
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3

@@ -45,15 +45,10 @@ app.get('/product', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'product.html'));
 });
 
-<<<<<<< HEAD
 app.get('/add-product', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'add.html'));
 });
 
-<<<<<<< HEAD
-=======
-=======
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
 app.get('/sale', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'sale.html'));
 });
@@ -66,9 +61,7 @@ app.get('/bills', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'bills.html'));
 });
 
-<<<<<<< HEAD
->>>>>>> 308a3c0 (initial commit)
-=======
+
 app.get('/stock', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'stock.html'));
 });
@@ -81,7 +74,7 @@ app.get('/revenue', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'revenue.html'));
 });
 
->>>>>>> ba41301bbeabe398a7ecf859acb2f4a359f5b6b3
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
