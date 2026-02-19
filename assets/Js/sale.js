@@ -8,6 +8,146 @@ function getToken() {
     return localStorage.getItem('token');
 }
 
+// --- API helper for sale page ---
+async function saleApiFetch(endpoint, options = {}) {
+    const token = getToken();
+    if (!token) {
+        window.location.href = '/login';
+        return null;
+    }
+    const defaults = {
+        headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json',
+        },
+    };
+    const config = { ...defaults, ...options, headers: { ...defaults.headers, ...(options.headers || {}) } };
+    const response = await fetch(`${API_BASE}/${endpoint}`, config);
+    if (!response.ok) {
+        if (response.status === 401) {
+            window.location.href = '/login';
+            return null;
+        }
+        throw new Error(`API error: ${response.status}`);
+    }
+    return response.json();
+}
+
+// --- Load Sale Stats ---
+async function loadSaleStats() {
+    try {
+        const data = await saleApiFetch('dashboard/sales-stats');
+        if (!data) return;
+
+        const el = (id) => document.getElementById(id);
+
+        // Total Sales
+        if (el('sale-total-revenue')) el('sale-total-revenue').innerHTML = `<span class="text-base text-gray-400 font-normal">Rs</span> ${(data.total_revenue || 0).toLocaleString()}`;
+        if (el('sale-total-count')) el('sale-total-count').textContent = `${(data.total_sales || 0)} transactions`;
+
+        // Avg Sale Value
+        if (el('sale-avg-value')) el('sale-avg-value').innerHTML = `<span class="text-base text-gray-400 font-normal">Rs</span> ${parseFloat(data.average_sale_amount || 0).toLocaleString()}`;
+        if (el('sale-avg-label')) el('sale-avg-label').textContent = `Avg qty: ${parseFloat(data.average_quantity_per_sale || 0).toFixed(1)} per sale`;
+    } catch (error) {
+        console.error('Failed to load sale stats:', error);
+    }
+}
+
+// --- Load Today's Sales ---
+async function loadTodaySales() {
+    try {
+        const today = new Date().toISOString().split('T')[0];
+        const data = await saleApiFetch(`sales/date-range?start_date=${today}&end_date=${today}`);
+        if (!data) return;
+
+        const sales = Array.isArray(data) ? data : (data.data || []);
+        const totalToday = sales.reduce((sum, s) => sum + (s.total_amount || 0), 0);
+
+        const el = (id) => document.getElementById(id);
+        if (el('sale-today-revenue')) el('sale-today-revenue').innerHTML = `<span class="text-base text-gray-400 font-normal">Rs</span> ${totalToday.toLocaleString()}`;
+        if (el('sale-today-count')) el('sale-today-count').textContent = `${sales.length} transactions today`;
+    } catch (error) {
+        console.error('Failed to load today sales:', error);
+    }
+}
+
+// --- Load Sales Table from API ---
+async function loadSalesTable() {
+    try {
+        const data = await saleApiFetch('sales');
+        if (!data) return;
+
+        const sales = Array.isArray(data) ? data : (data.data || []);
+        const tbody = document.querySelector('#sale-table tbody');
+        if (!tbody) return;
+
+        if (sales.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center py-8 text-gray-400">No sales found</td></tr>';
+            return;
+        }
+
+        const colors = ['purple', 'blue', 'orange', 'green', 'pink', 'indigo', 'gray'];
+
+        tbody.innerHTML = sales.map((sale, idx) => {
+            const productName = sale.products?.name || 'Product';
+            const initials = productName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+            const color = colors[idx % colors.length];
+            const date = sale.sale_date
+                ? new Date(sale.sale_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' +
+                  new Date(sale.created_at || sale.sale_date).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })
+                : '';
+            const amount = (sale.total_amount || 0).toLocaleString();
+
+            return `
+                <tr class="hover:bg-gray-50 transition group" data-sale-id="${sale.id}">
+                    <td class="py-4 px-6 font-medium text-green-600">#SALE-${String(sale.id).slice(-4).padStart(4, '0')}</td>
+                    <td class="py-4 px-6">
+                        <div class="flex items-center gap-3">
+                            <div class="h-8 w-8 rounded-full bg-${color}-100 text-${color}-600 flex items-center justify-center text-xs font-bold">${initials}</div>
+                            <span class="font-medium text-gray-800">${productName}</span>
+                        </div>
+                    </td>
+                    <td class="py-4 px-6 text-gray-500">${sale.quantity_sold || 0} items</td>
+                    <td class="py-4 px-6 font-bold text-gray-800">Rs ${amount}</td>
+                    <td class="py-4 px-6">
+                        <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
+                            Sale
+                        </span>
+                    </td>
+                    <td class="py-4 px-6 text-gray-500">${date}</td>
+                    <td class="py-4 px-6 text-right">
+                        <div class="flex justify-end gap-2">
+                            <button class="text-gray-400 hover:text-green-600 p-1 transition" title="View Details">
+                                <i class="fa-solid fa-eye text-xs"></i>
+                            </button>
+                            <button class="text-gray-400 hover:text-green-600 p-1 transition" title="Delete" onclick="deleteSaleRecord('${sale.id}')">
+                                <i class="fa-solid fa-trash text-xs"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Failed to load sales table:', error);
+    }
+}
+
+// --- Delete Sale ---
+async function deleteSaleRecord(saleId) {
+    if (!confirm('Are you sure you want to delete this sale?')) return;
+    try {
+        await saleApiFetch(`sales/${saleId}`, { method: 'DELETE' });
+        alert('Sale deleted successfully');
+        loadSalesTable();
+        loadSaleStats();
+        loadTodaySales();
+    } catch (error) {
+        console.error('Failed to delete sale:', error);
+        alert('Failed to delete sale');
+    }
+}
+
 // Fetch products for dropdown
 async function fetchProducts() {
     try {
@@ -51,7 +191,7 @@ function populateProductDropdown() {
     select.innerHTML = '<option value="">-- Select a product --</option>';
     
     products.forEach(product => {
-        const stock = product.stock || product.quantity || 0;
+        const stock = product.stock_quantity || product.stock || product.quantity || 0;
         const option = document.createElement('option');
         option.value = product.id;
         option.textContent = `${product.name} (Stock: ${stock})`;
@@ -68,7 +208,7 @@ document.addEventListener('change', function(e) {
         const priceInput = document.getElementById('productPrice');
         
         if (selectedOption.value) {
-            priceInput.value = `Rs ${selectedOption.dataset.price}`;
+            priceInput.value = selectedOption.dataset.price;
         } else {
             priceInput.value = '';
         }
@@ -128,7 +268,12 @@ function addProductToSale() {
     }
     
     const productName = selectedOption.textContent.split(' (Stock:')[0];
-    const price = parseFloat(selectedOption.dataset.price) || 0;
+    const price = parseFloat(document.getElementById('productPrice').value) || 0;
+    
+    if (price <= 0) {
+        alert('Please enter a valid price');
+        return;
+    }
     
     // Check if product already in list
     const existingIndex = saleItems.findIndex(item => item.id === productId);
@@ -195,7 +340,7 @@ function renderSaleItems() {
             </td>
             <td class="py-3 px-4 text-center font-bold text-gray-800">Rs ${item.total.toLocaleString()}</td>
             <td class="py-3 px-4 text-center">
-                <button onclick="removeItem(${index})" class="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition">
+                <button onclick="removeItem(${index})" class="text-green-600 hover:text-green-700 hover:bg-green-50 p-2 rounded-lg transition">
                     <i class="fa-solid fa-trash text-sm"></i>
                 </button>
             </td>
@@ -215,7 +360,7 @@ function updateItemQty(index, change) {
     
     // Check stock limit
     const product = products.find(p => p.id == item.id);
-    const stock = product ? (product.stock || product.quantity || 999) : 999;
+    const stock = product ? (product.stock_quantity || product.stock || product.quantity || 999) : 999;
     
     if (newQty > stock) {
         alert(`Only ${stock} items available in stock`);
@@ -250,113 +395,60 @@ function updateSummary() {
     document.getElementById('grandTotal').textContent = `Rs ${grandTotal.toLocaleString()}`;
 }
 
-// Save sale
+// Save sale - create one sale record per item (backend expects individual product sales)
 async function saveSale() {
     if (saleItems.length === 0) {
         alert('Please add at least one item to the sale');
         return;
     }
     
-    const customerName = document.getElementById('customerName').value.trim() || 'Walk-in Customer';
-    const customerPhone = document.getElementById('customerPhone').value.trim();
-    const paymentMethod = document.querySelector('input[name="paymentMethod"]:checked')?.value || 'cash';
     const notes = document.getElementById('saleNotes').value.trim();
     const discount = parseFloat(document.getElementById('discountInput').value) || 0;
     
-    const subtotal = saleItems.reduce((sum, item) => sum + item.total, 0);
-    const grandTotal = Math.max(0, subtotal - discount);
+    let successCount = 0;
+    let errors = [];
     
-    const saleData = {
-        customer_name: customerName,
-        customer_phone: customerPhone,
-        payment_method: paymentMethod,
-        notes: notes,
-        items: saleItems,
-        subtotal: subtotal,
-        discount: discount,
-        total: grandTotal
-    };
-    
-    try {
-        // Try to save to API
-        const response = await fetch(`${API_BASE}/sales`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${getToken()}`
-            },
-            body: JSON.stringify(saleData)
-        });
+    for (const item of saleItems) {
+        const saleData = {
+            product_id: item.id,
+            quantity_sold: item.quantity,
+            unit_price: item.price,
+            total_amount: item.total,
+            sale_date: new Date().toISOString().split('T')[0],
+            notes: notes || null
+        };
         
-        if (response.ok) {
-            alert('Sale completed successfully!');
-            closeSaleModal();
-            location.reload();
-            return;
+        try {
+            const response = await fetch(`${API_BASE}/sales`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${getToken()}`
+                },
+                body: JSON.stringify(saleData)
+            });
+            
+            if (response.ok) {
+                successCount++;
+            } else {
+                const err = await response.json().catch(() => ({}));
+                errors.push(`${item.name}: ${err.error || err.message || 'Failed'}`);
+            }
+        } catch (error) {
+            errors.push(`${item.name}: ${error.message}`);
         }
-    } catch (error) {
-        console.error('API Error:', error);
     }
     
-    // Demo mode - add to table directly
-    addSaleToTable(saleData);
-    alert('Sale completed successfully!');
-    closeSaleModal();
-}
-
-// Add sale to table (demo mode)
-function addSaleToTable(saleData) {
-    const tbody = document.querySelector('#sale-table tbody');
-    const saleId = `#SALE-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
-    const initials = saleData.customer_name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-    const colors = ['purple', 'blue', 'orange', 'green', 'pink', 'indigo'];
-    const randomColor = colors[Math.floor(Math.random() * colors.length)];
-    
-    const paymentBadges = {
-        cash: 'bg-green-50 text-green-700 border-green-100',
-        card: 'bg-blue-50 text-blue-700 border-blue-100',
-        upi: 'bg-purple-50 text-purple-700 border-purple-100',
-        credit: 'bg-orange-50 text-orange-700 border-orange-100'
-    };
-    
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ', ' + 
-                    now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
-    
-    const newRow = document.createElement('tr');
-    newRow.className = 'hover:bg-gray-50 transition group';
-    newRow.innerHTML = `
-        <td class="py-4 px-6 font-medium text-red-500">${saleId}</td>
-        <td class="py-4 px-6">
-            <div class="flex items-center gap-3">
-                <div class="h-8 w-8 rounded-full bg-${randomColor}-100 text-${randomColor}-600 flex items-center justify-center text-xs font-bold">${initials}</div>
-                <span class="font-medium text-gray-800">${saleData.customer_name}</span>
-            </div>
-        </td>
-        <td class="py-4 px-6 text-gray-500">${saleData.items.length} items</td>
-        <td class="py-4 px-6 font-bold text-gray-800">Rs ${saleData.total.toLocaleString()}</td>
-        <td class="py-4 px-6">
-            <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-medium ${paymentBadges[saleData.payment_method]} border">
-                ${saleData.payment_method.charAt(0).toUpperCase() + saleData.payment_method.slice(1)}
-            </span>
-        </td>
-        <td class="py-4 px-6 text-gray-500">${dateStr}</td>
-        <td class="py-4 px-6 text-right">
-            <div class="flex justify-end gap-2">
-                <button class="text-gray-400 hover:text-red-500 p-1 transition" title="View Details">
-                    <i class="fa-solid fa-eye text-xs"></i>
-                </button>
-                <button class="text-gray-400 hover:text-red-500 p-1 transition" title="Edit">
-                    <i class="fa-solid fa-pen-to-square text-xs"></i>
-                </button>
-                <button class="text-gray-400 hover:text-red-500 p-1 transition" title="Delete">
-                    <i class="fa-solid fa-trash text-xs"></i>
-                </button>
-            </div>
-        </td>
-    `;
-    
-    tbody.insertBefore(newRow, tbody.firstChild);
+    if (successCount > 0) {
+        alert(`${successCount} sale(s) completed successfully!${errors.length > 0 ? '\nErrors: ' + errors.join(', ') : ''}`);
+        closeSaleModal();
+        // Reload dynamic data
+        loadSalesTable();
+        loadSaleStats();
+        loadTodaySales();
+    } else {
+        alert('Failed to complete sale: ' + errors.join(', '));
+    }
 }
 
 // View sale modal
@@ -385,7 +477,7 @@ function openViewModal(saleId) {
         content.innerHTML = `
             <div class="space-y-4">
                 <div class="flex justify-between items-center pb-4 border-b">
-                    <span class="text-2xl font-bold text-red-500">${saleData.id}</span>
+                    <span class="text-2xl font-bold text-green-600">${saleData.id}</span>
                     <span class="text-sm text-gray-500">${saleData.date}</span>
                 </div>
                 <div class="grid grid-cols-2 gap-4">
@@ -403,7 +495,7 @@ function openViewModal(saleId) {
                     </div>
                     <div>
                         <p class="text-xs text-gray-500 uppercase">Total Amount</p>
-                        <p class="font-bold text-lg text-[#E53935]">${saleData.total}</p>
+                        <p class="font-bold text-lg text-[#16a34a]">${saleData.total}</p>
                     </div>
                 </div>
             </div>
@@ -531,6 +623,17 @@ document.addEventListener('keydown', function(e) {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', function() {
-    // Load products on page load
+    // Check auth
+    if (!getToken()) {
+        window.location.href = '/login';
+        return;
+    }
+
+    // Load products for the sale modal
     fetchProducts();
+
+    // Load dynamic stats and sales table
+    loadSaleStats();
+    loadTodaySales();
+    loadSalesTable();
 });

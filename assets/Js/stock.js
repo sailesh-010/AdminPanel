@@ -11,10 +11,52 @@ let productToDelete = null;
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
-    fetchProducts();
+    fetchAllStock();
     fetchCategories();
-    loadUserInfo();
 });
+
+// Fetch ALL stock without pagination
+async function fetchAllStock() {
+    try {
+        const token = localStorage.getItem('token');
+        
+        if (!token) {
+            console.error('No token found');
+            window.location.href = '/login';
+            return;
+        }
+
+        // Fetch all products without limit
+        const response = await fetch('/api/products?limit=10000', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                window.location.href = '/login';
+                return;
+            }
+            throw new Error('Failed to fetch products');
+        }
+
+        const data = await response.json();
+        allProducts = data.products || [];
+        totalProducts = data.total || 0;
+        currentPage = 1;
+
+        filterProducts();
+        updateStats();
+        
+    } catch (error) {
+        console.error('Error fetching all stock:', error);
+        showError('Failed to load stock. Please try again.');
+    }
+}
 
 // Check authentication
 function checkAuth() {
@@ -26,19 +68,13 @@ function checkAuth() {
     return true;
 }
 
-// Load user info
-function loadUserInfo() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const userName = user.name || user.email || 'User';
-    document.getElementById('userName').textContent = userName;
-    document.getElementById('userInitial').textContent = userName.charAt(0).toUpperCase();
-}
+// User info is now loaded centrally by sidebar.js loadHeaderUser()
 
 // Fetch categories for filter dropdown
 async function fetchCategories() {
     try {
         const token = localStorage.getItem('token');
-        const response = await fetch('/api/products/category', {
+        const response = await fetch('/api/categories', {
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json'
@@ -61,8 +97,9 @@ function populateCategoryFilter(categories) {
     
     categories.forEach(category => {
         const option = document.createElement('option');
-        option.value = category;
-        option.textContent = category;
+        const categoryName = typeof category === 'string' ? category : (category.name || String(category));
+        option.value = categoryName;
+        option.textContent = categoryName;
         select.appendChild(option);
     });
 }
@@ -190,7 +227,7 @@ function renderProducts() {
                         <i class="fa-solid fa-box-open text-gray-300 text-5xl mb-4"></i>
                         <p class="text-gray-500 font-medium">No products found</p>
                         <p class="text-gray-400 text-sm mt-1">Try adjusting your filters or add new products</p>
-                        <button onclick="openAddModal()" class="mt-4 inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                        <button onclick="openAddModal()" class="mt-4 inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition">
                             <i class="fa-solid fa-plus"></i> Add Product
                         </button>
                     </div>
@@ -209,11 +246,11 @@ function renderProducts() {
         let rowClass = '';
         
         if (isOutOfStock) {
-            statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-red-100 text-red-800">Out of Stock</span>`;
-            rowClass = 'bg-red-50';
+            statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Out of Stock</span>`;
+            rowClass = 'bg-green-50';
         } else if (isLowStock) {
-            statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-orange-100 text-orange-800">Low Stock</span>`;
-            rowClass = 'bg-orange-50';
+            statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Low Stock</span>`;
+            rowClass = 'bg-green-50';
         } else {
             statusBadge = `<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">In Stock</span>`;
         }
@@ -243,15 +280,15 @@ function renderProducts() {
                 <td class="px-6 py-4 text-center text-gray-700">${sizeRange}</td>
                 <td class="px-6 py-4 text-right font-semibold text-gray-800">₹${Number(product.price).toFixed(2)}</td>
                 <td class="px-6 py-4 text-center">
-                    <span class="font-semibold ${isOutOfStock ? 'text-red-600' : isLowStock ? 'text-orange-600' : 'text-gray-800'}">${qty}</span>
+                    <span class="font-semibold ${isOutOfStock ? 'text-green-600' : isLowStock ? 'text-green-500' : 'text-gray-800'}">${qty}</span>
                 </td>
                 <td class="px-6 py-4 text-center">${statusBadge}</td>
                 <td class="px-6 py-4 text-center">
                     <div class="flex items-center justify-center gap-2">
-                        <button onclick="editProduct('${product.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                        <button onclick="editProduct('${product.id}')" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition" title="Edit">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
-                        <button onclick="deleteProduct('${product.id}', '${escapeHtml(product.name)}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Delete">
+                        <button onclick="deleteProduct('${product.id}', '${escapeHtml(product.name)}')" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition" title="Delete">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -487,8 +524,9 @@ function populateAddCategoryDropdown() {
     
     categories.forEach(category => {
         const option = document.createElement('option');
-        option.value = category;
-        option.textContent = category;
+        const categoryName = typeof category === 'string' ? category : (category.name || String(category));
+        option.value = categoryName;
+        option.textContent = categoryName;
         select.appendChild(option);
     });
 }
@@ -578,13 +616,13 @@ async function addProduct() {
 
 // Show message in add form
 function showAddMessage(messageDiv, message, type) {
-    messageDiv.classList.remove('hidden', 'bg-green-50', 'border-green-200', 'text-green-700', 'bg-red-50', 'border-red-200', 'text-red-700');
+    messageDiv.classList.remove('hidden', 'bg-green-50', 'border-green-200', 'text-green-700');
     
     if (type === 'success') {
         messageDiv.className = 'bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm';
         messageDiv.innerHTML = '<i class="fa-solid fa-check-circle mr-2"></i>' + message;
     } else {
-        messageDiv.className = 'bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm';
+        messageDiv.className = 'bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm';
         messageDiv.innerHTML = '<i class="fa-solid fa-exclamation-circle mr-2"></i>' + message;
     }
 }

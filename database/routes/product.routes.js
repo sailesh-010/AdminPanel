@@ -6,7 +6,6 @@ import {
   updateProduct,
   deleteProduct,
   getTopProducts,
-  getCategories,
   searchProducts
 } from "../controllers/product.controller.js";
 import { authMiddleware } from "../middleware/auth.middleware.js";
@@ -47,8 +46,6 @@ router.get("/debug/categories", async (req, res) => {
 // Add a new product
 router.post("/add", addProduct);
 
-router.get("/category", getCategories);
-
 router.get("/search", searchProducts);
 
 // Get all products
@@ -62,7 +59,6 @@ router.put("/:id", updateProduct);
 
 // Delete a product
 router.delete("/:id", deleteProduct);
-
 
 // Top selling products
 router.get('/top-products', getTopProducts);

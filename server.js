@@ -17,6 +17,13 @@ const __dirname = path.dirname(__filename);
 
 const PORT = process.env.PORT || 5000;
 
+// Serve service worker from root with correct headers
+app.get('/service-worker.js', (req, res) => {
+  res.setHeader('Content-Type', 'application/javascript');
+  res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+  res.sendFile(path.join(__dirname, 'service-worker.js'));
+});
+
 // Serve static files from both root and public directories
 app.use(express.static(__dirname));
 app.use('/public', express.static(path.join(__dirname, 'public')));
@@ -46,15 +53,19 @@ app.get('/product', (req, res) => {
 });
 
 app.get('/add-product', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'add.html'));
+  res.sendFile(path.join(__dirname, 'public', 'add-product.html'));
 });
 
 app.get('/sale', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'sale.html'));
 });
 
+app.get('/add-bill', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'add-bill.html'));
+});
+
 app.get('/bill', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'bill.html'));
+  res.sendFile(path.join(__dirname, 'public', 'add-bill.html'));
 });
 
 app.get('/bills', (req, res) => {
@@ -74,6 +85,10 @@ app.get('/revenue', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'revenue.html'));
 });
 
+// Test endpoint to verify API is working
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working', timestamp: new Date().toISOString() });
+});
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);

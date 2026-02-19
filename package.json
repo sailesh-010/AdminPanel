@@ -4,7 +4,8 @@
   "main": "server.js",
   "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "vitest --run",
+    "test:watch": "vitest",
     "start": "nodemon server.js"
   },
   "keywords": [],
@@ -20,10 +21,13 @@
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.1.5",
-    "nodemon": "^3.1.11",
+    "nodemon": "^1.0.2",
     "postgres": "^3.4.8"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "fast-check": "^3.13.0",
+    "vitest": "^4.0.18"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/sailesh-010/AdminPanel.git"

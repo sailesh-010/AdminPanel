@@ -40,11 +40,11 @@ function updateProductCountButtons(activeCount) {
         if (count === activeCount) {
             btn.classList.add('active');
             btn.classList.remove('bg-gray-200', 'text-gray-700');
-            btn.classList.add('bg-red-500', 'text-white');
+            btn.classList.add('bg-green-600', 'text-white');
         } else {
             btn.classList.remove('active');
             btn.classList.add('bg-gray-200', 'text-gray-700');
-            btn.classList.remove('bg-red-500', 'text-white');
+            btn.classList.remove('bg-green-600', 'text-white');
         }
     });
     document.getElementById('customProductCount').value = activeCount;
@@ -60,18 +60,18 @@ function generateProductForms(count) {
             <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8 max-w-2xl">
                 <div class="flex items-center justify-between mb-6">
                     <h3 class="text-lg font-bold text-gray-900">Product #${i}</h3>
-                    <span class="text-xs bg-red-100 text-red-700 px-3 py-1 rounded-full font-medium">Form ${i}/${count}</span>
+                    <span class="text-xs bg-green-100 text-green-700 px-3 py-1 rounded-full font-medium">Form ${i}/${count}</span>
                 </div>
                 <form class="addProductForm space-y-6">
                     
                     <!-- Product Name -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Product Name <span class="text-red-500">*</span>
+                            Product Name <span class="text-green-600">*</span>
                         </label>
                         <input 
                             type="text" 
-                            class="productName w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                            class="productName w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                             name="productName" 
                             placeholder="Enter product name"
                             required
@@ -81,10 +81,10 @@ function generateProductForms(count) {
                     <!-- Product Category -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Category Type <span class="text-red-500">*</span>
+                            Category Type <span class="text-green-600">*</span>
                         </label>
                         <select 
-                            class="productCategory w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition bg-white"
+                            class="productCategory w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition bg-white"
                             name="productCategory" 
                             required
                         >
@@ -95,11 +95,11 @@ function generateProductForms(count) {
                     <!-- Product Price -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Product Price (₹) <span class="text-red-500">*</span>
+                            Product Price (₹) <span class="text-green-600">*</span>
                         </label>
                         <input 
                             type="number" 
-                            class="productPrice w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                            class="productPrice w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                             name="productPrice" 
                             placeholder="Enter price"
                             step="0.01"
@@ -112,11 +112,11 @@ function generateProductForms(count) {
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                Minimum Size <span class="text-red-500">*</span>
+                                Minimum Size <span class="text-green-600">*</span>
                             </label>
                             <input 
                                 type="number" 
-                                class="sizeMin w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                                class="sizeMin w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                                 name="sizeMin" 
                                 placeholder="Min size"
                                 step="0.1"
@@ -126,11 +126,11 @@ function generateProductForms(count) {
                         </div>
                         <div>
                             <label class="block text-sm font-semibold text-gray-700 mb-2">
-                                Maximum Size <span class="text-red-500">*</span>
+                                Maximum Size <span class="text-green-600">*</span>
                             </label>
                             <input 
                                 type="number" 
-                                class="sizeMax w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                                class="sizeMax w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                                 name="sizeMax" 
                                 placeholder="Max size"
                                 step="0.1"
@@ -143,11 +143,11 @@ function generateProductForms(count) {
                     <!-- Number of Sets -->
                     <div>
                         <label class="block text-sm font-semibold text-gray-700 mb-2">
-                            Number of Sets <span class="text-red-500">*</span>
+                            Number of Sets <span class="text-green-600">*</span>
                         </label>
                         <input 
                             type="number" 
-                            class="productQuantity w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition"
+                            class="productQuantity w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
                             name="productQuantity" 
                             placeholder="Enter quantity of sets"
                             min="1"
@@ -160,7 +160,7 @@ function generateProductForms(count) {
                     <div class="flex gap-4 pt-4">
                         <button 
                             type="submit" 
-                            class="flex-1 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2.5 rounded-lg transition duration-200 shadow-md hover:shadow-lg"
+                            class="flex-1 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2.5 rounded-lg transition duration-200 shadow-md hover:shadow-lg"
                         >
                             <i class="fa-solid fa-check mr-2"></i> Add Product
                         </button>
@@ -176,7 +176,7 @@ function generateProductForms(count) {
                     <div class="successMessage hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
                         <i class="fa-solid fa-check-circle mr-2"></i> Product added successfully!
                     </div>
-                    <div class="errorMessage hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
+                    <div class="errorMessage hidden bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm"></div>
 
                 </form>
             </div>
@@ -196,12 +196,12 @@ async function fetchCategories() {
         
         if (!token) {
             console.error('❌ No token found in localStorage');
-            return ['No categories available'];
+            return [];
         }
         
         console.log('📡 Fetching categories with token...');
         
-        const response = await fetch('/api/products/category', {
+        const response = await fetch('/api/categories', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -214,22 +214,22 @@ async function fetchCategories() {
         if (!response.ok) {
             const errorText = await response.text();
             console.error('❌ Failed to fetch categories:', response.status, errorText);
-            return ['Error loading categories'];
+            return [];
         }
 
         const result = await response.json();
         console.log('✅ Categories response:', result);
         
-        const categories = result.data || result;
+        const categories = Array.isArray(result) ? result : (result.data || []);
         
         if (!Array.isArray(categories)) {
             console.error('❌ Categories is not an array:', categories);
-            return ['Invalid response format'];
+            return [];
         }
 
         if (categories.length === 0) {
             console.warn('⚠️ No categories found for this tenant');
-            return ['No categories available'];
+            return [];
         }
 
         console.log(`✅ Loaded ${categories.length} categories:`, categories);
@@ -237,7 +237,7 @@ async function fetchCategories() {
         
     } catch (error) {
         console.error('🔴 Error fetching categories:', error);
-        return ['Error: ' + error.message];
+        return [];
     }
 }
 
@@ -261,8 +261,10 @@ function updateCategoryDropdown(select, categories) {
     
     categories.forEach(category => {
         const option = document.createElement('option');
-        option.value = category;
-        option.textContent = category;
+        // Handle both string and object formats
+        const categoryName = typeof category === 'string' ? category : (category.name || String(category));
+        option.value = categoryName;
+        option.textContent = categoryName;
         select.appendChild(option);
     });
 }

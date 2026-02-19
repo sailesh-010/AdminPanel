@@ -77,62 +77,6 @@ export const addProduct = async (req, res) => {
   }
 };
 
-// Get product categories
-export const getCategories = async (req, res) => {
-  try {
-    const tenantId = req.tenant_id;
-    
-    console.log(`🏢 Tenant ID from middleware: ${tenantId}`);
-
-    if (!tenantId) {
-      return res.status(401).json({ error: 'Tenant ID not found' });
-    }
-
-    // Get the tenant's shop_type_id
-    const { data: tenant, error: tError } = await supabase
-      .from('tenants')
-      .select('shop_type_id')
-      .eq('id', tenantId)
-      .single();
-
-    console.log('🏪 Tenant query result:', { tenant, tError });
-
-    if (tError || !tenant?.shop_type_id) {
-      console.log('⚠️ No shop_type_id found, returning all categories');
-      
-      // Fallback: return all categories
-      const { data: categories, error: cError } = await supabase
-        .from('categories')
-        .select('name')
-        .order('name', { ascending: true });
-
-      if (cError) throw cError;
-      console.log(`✅ Found ${categories.length} categories (all):`, categories);
-      return res.status(200).json(categories.map(c => c.name));
-    }
-
-    const shopTypeId = tenant.shop_type_id;
-    console.log(`🏪 Shop Type ID: ${shopTypeId}`);
-
-    // Fetch categories for this shop type
-    const { data: categories, error: cError } = await supabase
-      .from('categories')
-      .select('name')
-      .eq('shop_type_id', shopTypeId)
-      .order('name', { ascending: true });
-
-    if (cError) {
-      console.error('❌ Categories error:', cError);
-      throw cError;
-    }
-
-    console.log(`✅ Found ${categories.length} categories (filtered):`, categories);
-    return res.status(200).json(categories.map(c => c.name));
-  } catch (error) {
-    console.error('❌ Get categories error:', error);
-    return res.status(500).json({ error: error.message });
-  }
-};
 
 // Get all products
 export const getAllProducts = async (req, res) => {

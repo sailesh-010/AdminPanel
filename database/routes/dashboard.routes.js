@@ -1,26 +1,33 @@
 import express from 'express';
+import {
+  getRevenueByCategory,
+  getTopSellingProducts,
+  getStockLevels,
+  getDashboardSummary,
+  getSalesStatistics
+} from '../controllers/dashboard.controller.js';
 import { authMiddleware } from '../middleware/auth.middleware.js';
 import { tenantMiddleware } from '../middleware/tenant.middleware.js';
-import { DashboardController } from '../controllers/dashboard.controller.js';
-import { getCategories } from "../controllers/category.controller.js";
-import { getTopProducts } from '../controllers/product.controller.js';
+import { databaseMiddleware } from '../middleware/database.middleware.js';
 
 const router = express.Router();
 
-// All dashboard routes require authentication and tenant validation
-router.use(authMiddleware);
-router.use(tenantMiddleware);
+// Apply auth, tenant, and database middleware to all routes
+router.use(authMiddleware, tenantMiddleware, databaseMiddleware);
 
-// Dashboard overview (cached)
-router.get('/overview', DashboardController.getOverview);
+// Get revenue by category
+router.get('/revenue-by-category', getRevenueByCategory);
 
-// Sales analytics
-router.get('/sales-analytics', DashboardController.getSalesAnalytics);
+// Get top-selling products
+router.get('/top-products', getTopSellingProducts);
 
-// Top selling products
-router.get('/top-products', getTopProducts);
+// Get current stock levels
+router.get('/stock-levels', getStockLevels);
 
-// Filter dashboard data by shop category
-router.get('/category', getCategories);
+// Get dashboard summary
+router.get('/summary', getDashboardSummary);
+
+// Get sales statistics
+router.get('/sales-stats', getSalesStatistics);
 
 export default router;

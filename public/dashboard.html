@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jha System - Retail Dashboard</title>
+    <title>sajha karobar - Retail Dashboard</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#16a34a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16.png">
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -36,19 +43,6 @@
             background: #a8a8a8; 
         }
 
-        .sidebar-link {
-            transition: all 0.2s;
-        }
-        .sidebar-link:hover, .sidebar-link.active {
-            background: linear-gradient(90deg, #E53935 0%, #EF5350 100%);
-            color: white;
-            box-shadow: 0 4px 6px -1px rgba(229, 57, 53, 0.3);
-            transform: translateX(4px);
-        }
-        .sidebar-link:hover i, .sidebar-link.active i {
-            color: white;
-        }
-
         /* Animation for cards */
         .stat-card {
             transition: transform 0.2s, box-shadow 0.2s;
@@ -71,7 +65,7 @@
         <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-8 z-10">
             <!-- Left: Mobile Menu & Search -->
             <div class="flex items-center gap-4 flex-1">
-                <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-red-500 p-1">
+                <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-green-600 p-1">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 
@@ -79,26 +73,25 @@
                     <span class="absolute left-3 top-2.5 text-gray-400">
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </span>
-                    <input type="text" placeholder="Search items, bills, or customers..." class="w-full bg-gray-100 hover:bg-gray-50 focus:bg-white border border-transparent focus:border-red-200 rounded-lg py-2 pl-10 pr-4 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-100">
+                    <input type="text" placeholder="Search items, bills, or customers..." class="w-full bg-gray-100 hover:bg-gray-50 focus:bg-white border border-transparent focus:border-green-200 rounded-lg py-2 pl-10 pr-4 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-green-100">
                 </div>
             </div>
 
             <!-- Right: Notifications & Profile -->
             <div class="flex items-center gap-4 lg:gap-6">
-                <button class="relative text-gray-400 hover:text-red-500 transition p-2 rounded-full hover:bg-gray-50">
+                <button class="relative text-gray-400 hover:text-green-600 transition p-2 rounded-full hover:bg-gray-50">
                     <i class="fa-regular fa-bell text-xl"></i>
-                    <span class="absolute top-1.5 right-2 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                    <span class="absolute top-1.5 right-2 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-white"></span>
                 </button>
                 
                 <div class="h-8 w-px bg-gray-200 hidden sm:block"></div>
-                
+
                 <div class="flex items-center gap-3 cursor-pointer p-1 rounded-lg hover:bg-gray-50 transition">
                     <div class="text-right hidden sm:block">
-                        <p class="text-sm font-bold text-gray-800 leading-none">Admin User</p>
-                        <p class="text-[10px] text-gray-500 font-medium uppercase mt-1">Store Manager</p>
+                        <p id="headerUserName" class="text-sm font-bold text-gray-800 leading-none">Loading...</p>
                     </div>
-                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-red-100 to-red-200 text-red-600 border border-red-200 flex items-center justify-center font-bold shadow-sm">
-                        AU
+                    <div id="headerUserInitial" class="h-10 w-10 rounded-full bg-gradient-to-br from-green-100 to-green-200 text-green-700 border border-green-200 flex items-center justify-center font-bold shadow-sm">
+                        ?
                     </div>
                 </div>
             </div>
@@ -117,7 +110,7 @@
                     <button class="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg font-medium text-sm shadow-sm transition">
                         <i class="fa-solid fa-download mr-2"></i> Report
                     </button>
-                    <button class="bg-[#E53935] hover:bg-[#D32F2F] text-white px-5 py-2 rounded-lg font-medium shadow-md shadow-red-200 flex items-center gap-2 transition active:scale-95">
+                    <button class="bg-[#16a34a] hover:bg-[#15803d] text-white px-5 py-2 rounded-lg font-medium shadow-md shadow-green-200 flex items-center gap-2 transition active:scale-95">
                         <i class="fa-solid fa-computer"></i> POS Counter
                     </button>
                 </div>
@@ -125,48 +118,48 @@
 
             <!-- 1. STATS GRID -->
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
-                <!-- Card 1 -->
+                <!-- Card 1: Total Products -->
                 <div class="stat-card bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total Stocks</p>
-                        <p class="text-2xl font-bold text-gray-800 mt-1">10,245</p>
-                        <p class="text-xs text-green-500 font-medium mt-1"><i class="fa-solid fa-arrow-up"></i> +2.5% vs last week</p>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total Products</p>
+                        <p id="total-products" class="text-2xl font-bold text-gray-800 mt-1">--</p>
+                        <p id="total-stock-label" class="text-xs text-gray-400 font-medium mt-1">Loading...</p>
                     </div>
-                    <div class="h-12 w-12 bg-red-50 rounded-xl flex items-center justify-center text-red-500 text-xl">
+                    <div class="h-12 w-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 text-xl">
                         <i class="fa-solid fa-boxes-stacked"></i>
                     </div>
                 </div>
-                <!-- Card 2 -->
+                <!-- Card 2: Revenue -->
                 <div class="stat-card bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
                     <div>
-                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Revenue</p>
-                        <p class="text-2xl font-bold text-gray-800 mt-1"><span class="text-base text-gray-400 font-normal mr-1">Rs</span>10,000</p>
-                        <p class="text-xs text-green-500 font-medium mt-1"><i class="fa-solid fa-arrow-up"></i> +12% vs last week</p>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total Revenue</p>
+                        <p id="total-revenue" class="text-2xl font-bold text-gray-800 mt-1">--</p>
+                        <p id="avg-sale-label" class="text-xs text-gray-400 font-medium mt-1">Loading...</p>
                     </div>
                     <div class="h-12 w-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 text-xl">
                         <i class="fa-solid fa-sack-dollar"></i>
                     </div>
                 </div>
-                <!-- Card 3 -->
-                <div class="stat-card bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
-                    <div>
-                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Net Profit</p>
-                        <p class="text-2xl font-bold text-gray-800 mt-1"><span class="text-base text-gray-400 font-normal mr-1">Rs</span>10,000</p>
-                        <p class="text-xs text-red-500 font-medium mt-1"><i class="fa-solid fa-arrow-down"></i> -1.2% vs last week</p>
-                    </div>
-                    <div class="h-12 w-12 bg-blue-50 rounded-xl flex items-center justify-center text-blue-500 text-xl">
-                        <i class="fa-solid fa-arrow-trend-up"></i>
-                    </div>
-                </div>
-                <!-- Card 4 -->
+                <!-- Card 3: Total Sales Count -->
                 <div class="stat-card bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
                     <div>
                         <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Total Sales</p>
-                        <p class="text-2xl font-bold text-gray-800 mt-1"><span class="text-base text-gray-400 font-normal mr-1">Rs</span>10,000</p>
-                        <p class="text-xs text-green-500 font-medium mt-1"><i class="fa-solid fa-arrow-up"></i> +8% vs last week</p>
+                        <p id="total-sales" class="text-2xl font-bold text-gray-800 mt-1">--</p>
+                        <p id="avg-qty-label" class="text-xs text-gray-400 font-medium mt-1">Loading...</p>
                     </div>
-                    <div class="h-12 w-12 bg-orange-50 rounded-xl flex items-center justify-center text-orange-500 text-xl">
-                        <i class="fa-solid fa-wallet"></i>
+                    <div class="h-12 w-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 text-xl">
+                        <i class="fa-solid fa-arrow-trend-up"></i>
+                    </div>
+                </div>
+                <!-- Card 4: Stock Status -->
+                <div class="stat-card bg-white p-5 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between">
+                    <div>
+                        <p class="text-xs font-semibold text-gray-400 uppercase tracking-wide">Stock Status</p>
+                        <p id="total-stock" class="text-2xl font-bold text-gray-800 mt-1">--</p>
+                        <p id="stock-alerts" class="text-xs text-gray-400 font-medium mt-1">Loading...</p>
+                    </div>
+                    <div class="h-12 w-12 bg-green-50 rounded-xl flex items-center justify-center text-green-600 text-xl">
+                        <i class="fa-solid fa-warehouse"></i>
                     </div>
                 </div>
             </div>
@@ -181,7 +174,7 @@
                             <h3 class="font-bold text-gray-800 text-lg">Sales Analytics</h3>
                             <p class="text-xs text-gray-500">Revenue vs. Profit over time</p>
                         </div>
-                        <select class="text-xs border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-red-200 cursor-pointer">
+                        <select class="text-xs border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-green-200 cursor-pointer">
                             <option>This Week</option>
                             <option>Last Week</option>
                             <option>This Month</option>
@@ -200,7 +193,7 @@
                         <!-- Items will be dynamically inserted here -->
                     </div>
                     
-                    <a href="/stock" class="w-full mt-4 py-2.5 text-sm text-red-600 font-semibold bg-red-50 hover:bg-red-100 rounded-lg transition flex items-center justify-center gap-2">
+                    <a href="/stock" class="w-full mt-4 py-2.5 text-sm text-green-700 font-semibold bg-green-50 hover:bg-green-100 rounded-lg transition flex items-center justify-center gap-2">
                         View All Stocks <i class="fa-solid fa-arrow-right text-xs"></i>
                     </a>
                 </div>
@@ -214,12 +207,12 @@
                         <p class="text-xs text-gray-500">Search, filter, and manage your products</p>
                     </div>
                     <div class="flex gap-2">
-                        <input type="text" id="product-search" placeholder="Search by product name..." class="w-full sm:w-64 bg-gray-100 hover:bg-gray-50 focus:bg-white border border-transparent focus:border-red-200 rounded-lg py-2 px-4 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-100">
-                        <select id="category-filter" class="text-xs border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-red-200 cursor-pointer">
+                        <input type="text" id="product-search" placeholder="Search by product name..." class="w-full sm:w-64 bg-gray-100 hover:bg-gray-50 focus:bg-white border border-transparent focus:border-green-200 rounded-lg py-2 px-4 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-green-100">
+                        <select id="category-filter" class="text-xs border border-gray-200 bg-gray-50 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-green-200 cursor-pointer">
                             <option value="">All Categories</option>
                         </select>
                         <label class="flex items-center gap-2 text-xs font-medium text-gray-500">
-                            <input type="checkbox" id="in-stock-filter" class="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500">
+                            <input type="checkbox" id="in-stock-filter" class="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500">
                             In Stock Only
                         </label>
                     </div>
@@ -250,7 +243,7 @@
                         <p class="text-xs text-gray-500">Latest bills generated from POS</p>
                     </div>
                     <div class="flex gap-2">
-                        <button class="text-xs font-medium text-gray-500 hover:text-red-500 px-3 py-1.5 border border-gray-200 rounded-md bg-gray-50">Filter</button>
+                        <button class="text-xs font-medium text-gray-500 hover:text-green-600 px-3 py-1.5 border border-gray-200 rounded-md bg-gray-50">Filter</button>
                         <button class="text-xs font-medium text-white px-3 py-1.5 rounded-md bg-gray-800 hover:bg-gray-700">Export CSV</button>
                     </div>
                 </div>
@@ -268,83 +261,19 @@
                                 <th class="py-4 px-6 font-semibold text-right">Action</th>
                             </tr>
                         </thead>
-                        <tbody class="text-sm divide-y divide-gray-50">
-                            <!-- Row 1 -->
-                            <tr class="hover:bg-gray-50 transition group">
-                                <td class="py-4 px-6 font-medium text-red-500">#INV-8859</td>
-                                <td class="py-4 px-6">
-                                    <div class="flex items-center gap-3">
-                                        <div class="h-8 w-8 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center text-xs font-bold">RS</div>
-                                        <span class="font-medium text-gray-800">Ram Sharma</span>
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6 text-gray-500">Jan 27, 2026</td>
-                                <td class="py-4 px-6 font-bold text-gray-800">Rs 1,200</td>
-                                <td class="py-4 px-6 text-gray-500">Cash</td>
-                                <td class="py-4 px-6">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
-                                        <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Paid
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 text-right">
-                                    <button class="text-gray-400 hover:text-gray-800 p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                                </td>
-                            </tr>
-                            
-                            <!-- Row 2 -->
-                            <tr class="hover:bg-gray-50 transition group">
-                                <td class="py-4 px-6 font-medium text-red-500">#INV-8860</td>
-                                <td class="py-4 px-6">
-                                    <div class="flex items-center gap-3">
-                                        <div class="h-8 w-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-xs font-bold">SR</div>
-                                        <span class="font-medium text-gray-800">Sita Retailers</span>
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6 text-gray-500">Jan 27, 2026</td>
-                                <td class="py-4 px-6 font-bold text-gray-800">Rs 15,400</td>
-                                <td class="py-4 px-6 text-gray-500">Credit</td>
-                                <td class="py-4 px-6">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-100">
-                                        <span class="h-1.5 w-1.5 rounded-full bg-yellow-500"></span> Pending
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 text-right">
-                                    <button class="text-gray-400 hover:text-gray-800 p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                                </td>
-                            </tr>
-
-                            <!-- Row 3 -->
-                            <tr class="hover:bg-gray-50 transition group">
-                                <td class="py-4 px-6 font-medium text-red-500">#INV-8861</td>
-                                <td class="py-4 px-6">
-                                    <div class="flex items-center gap-3">
-                                        <div class="h-8 w-8 rounded-full bg-gray-100 text-gray-600 flex items-center justify-center text-xs font-bold">GK</div>
-                                        <span class="font-medium text-gray-800">Gopal Kirana</span>
-                                    </div>
-                                </td>
-                                <td class="py-4 px-6 text-gray-500">Jan 26, 2026</td>
-                                <td class="py-4 px-6 font-bold text-gray-800">Rs 3,250</td>
-                                <td class="py-4 px-6 text-gray-500">E-Sewa</td>
-                                <td class="py-4 px-6">
-                                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700 border border-green-100">
-                                        <span class="h-1.5 w-1.5 rounded-full bg-green-500"></span> Paid
-                                    </span>
-                                </td>
-                                <td class="py-4 px-6 text-right">
-                                    <button class="text-gray-400 hover:text-gray-800 p-1"><i class="fa-solid fa-ellipsis-vertical"></i></button>
-                                </td>
-                            </tr>
+                        <tbody id="recent-sales-body" class="text-sm divide-y divide-gray-50">
+                            <!-- Rows will be dynamically inserted here -->
                         </tbody>
                     </table>
                 </div>
                 <div class="p-4 border-t border-gray-100 flex items-center justify-center">
-                    <button class="text-sm font-medium text-red-500 hover:text-red-700 transition">View All Transactions</button>
+                    <button class="text-sm font-medium text-green-600 hover:text-green-700 transition">View All Transactions</button>
                 </div>
             </div>
 
             <!-- Footer -->
             <footer class="mt-8 text-center text-gray-400 text-xs pb-4">
-                &copy; 2026 Jha Retail System. All rights reserved.
+                &copy; 2026 sajha karobar. All rights reserved.
             </footer>
 
         </div>
@@ -353,6 +282,8 @@
 <script src="/assets/Js/components/sidebar.js"></script>
 <script src="/assets/Js/dashboard.js"></script>
 <script>
-    initSidebar('dashboard');
+    document.addEventListener('DOMContentLoaded', function() {
+        initSidebar('dashboard');
+    });
 </script>
 </html>

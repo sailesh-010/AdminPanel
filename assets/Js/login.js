@@ -63,6 +63,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
       // Store token in localStorage
       localStorage.setItem('token', data.token);
+      localStorage.setItem('refresh_token', data.refresh_token);
+      localStorage.setItem('loginTimestamp', Date.now().toString());
       localStorage.setItem('user', JSON.stringify(data.user));
       localStorage.setItem('tenant', JSON.stringify(data.tenant));
 

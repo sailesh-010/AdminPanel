@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shajha System - Workers Management</title>
+    <title>sajha karobar - Workers Management</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#16a34a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="apple-touch-icon" href="/assets/images/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/images/favicon-32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/images/favicon-16.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -26,19 +33,6 @@
             background: #a8a8a8; 
         }
 
-        .sidebar-link {
-            transition: all 0.2s;
-        }
-        .sidebar-link:hover, .sidebar-link.active {
-            background: linear-gradient(90deg, #E53935 0%, #EF5350 100%);
-            color: white;
-            box-shadow: 0 4px 6px -1px rgba(229, 57, 53, 0.3);
-            transform: translateX(4px);
-        }
-        .sidebar-link:hover i, .sidebar-link.active i {
-            color: white;
-        }
-
         .stat-card {
             transition: transform 0.2s, box-shadow 0.2s;
         }
@@ -57,7 +51,7 @@
 
         .loading-spinner {
             border: 3px solid #f3f3f3;
-            border-top: 3px solid #E53935;
+            border-top: 3px solid #16a34a;
             border-radius: 50%;
             width: 40px;
             height: 40px;
@@ -81,7 +75,7 @@
         <!-- Header -->
         <header class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-8 z-10">
             <div class="flex items-center gap-4 flex-1">
-                <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-red-500 p-1">
+                <button onclick="toggleSidebar()" class="lg:hidden text-gray-500 hover:text-green-600 p-1">
                     <i class="fa-solid fa-bars text-xl"></i>
                 </button>
                 
@@ -90,24 +84,23 @@
                         <i class="fa-solid fa-magnifying-glass"></i>
                     </span>
                     <input type="text" id="searchInput" placeholder="Search workers..." 
-                        class="w-full bg-gray-100 hover:bg-gray-50 focus:bg-white border border-transparent focus:border-red-200 rounded-lg py-2 pl-10 pr-4 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-red-100"
+                        class="w-full bg-gray-100 hover:bg-gray-50 focus:bg-white border border-transparent focus:border-green-200 rounded-lg py-2 pl-10 pr-4 text-sm transition-all focus:outline-none focus:ring-2 focus:ring-green-100"
                         oninput="handleSearch()">
                 </div>
             </div>
 
             <div class="flex items-center gap-4 lg:gap-6">
-                <button class="relative text-gray-400 hover:text-red-500 transition p-2 rounded-full hover:bg-gray-50">
+                <button class="relative text-gray-400 hover:text-green-600 transition p-2 rounded-full hover:bg-gray-50">
                     <i class="fa-regular fa-bell text-xl"></i>
-                    <span class="absolute top-1.5 right-2 h-2.5 w-2.5 bg-red-500 rounded-full border-2 border-white"></span>
+                    <span class="absolute top-1.5 right-2 h-2.5 w-2.5 bg-green-500 rounded-full border-2 border-white"></span>
                 </button>
                 
                 <div class="flex items-center gap-3 cursor-pointer group">
                     <div class="hidden lg:block text-right">
-                        <p id="userName" class="text-sm font-semibold text-gray-700">Loading...</p>
-                        <p class="text-xs text-gray-400">Admin</p>
+                        <p id="headerUserName" class="text-sm font-semibold text-gray-700">Loading...</p>
                     </div>
-                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white font-bold shadow-md group-hover:shadow-lg transition">
-                        <span id="userInitial">?</span>
+                    <div class="h-10 w-10 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold shadow-md group-hover:shadow-lg transition">
+                        <span id="headerUserInitial">?</span>
                     </div>
                 </div>
             </div>
@@ -121,7 +114,7 @@
                     <h2 class="text-2xl lg:text-3xl font-bold text-gray-800">Workers Management</h2>
                     <p class="text-gray-500 mt-1">Manage employees, salaries and attendance</p>
                 </div>
-                <button onclick="openAddWorkerModal()" class="inline-flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 text-white font-semibold py-2.5 px-5 rounded-lg transition duration-200 shadow-md hover:shadow-lg">
+                <button onclick="openAddWorkerModal()" class="inline-flex items-center gap-2 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 text-white font-semibold py-2.5 px-5 rounded-lg transition duration-200 shadow-md hover:shadow-lg">
                     <i class="fa-solid fa-user-plus"></i> Add Worker
                 </button>
             </div>
@@ -134,8 +127,8 @@
                             <p class="text-sm text-gray-500">Total Workers</p>
                             <p id="totalWorkers" class="text-2xl font-bold text-gray-800 mt-1">0</p>
                         </div>
-                        <div class="h-12 w-12 rounded-full bg-blue-100 flex items-center justify-center">
-                            <i class="fa-solid fa-users text-blue-600 text-xl"></i>
+                        <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                            <i class="fa-solid fa-users text-green-600 text-xl"></i>
                         </div>
                     </div>
                 </div>
@@ -158,8 +151,8 @@
                             <p class="text-sm text-gray-500">Total Monthly Salary</p>
                             <p id="totalSalary" class="text-2xl font-bold text-gray-800 mt-1">₹0</p>
                         </div>
-                        <div class="h-12 w-12 rounded-full bg-purple-100 flex items-center justify-center">
-                            <i class="fa-solid fa-indian-rupee-sign text-purple-600 text-xl"></i>
+                        <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                            <i class="fa-solid fa-indian-rupee-sign text-green-600 text-xl"></i>
                         </div>
                     </div>
                 </div>
@@ -168,10 +161,10 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <p class="text-sm text-gray-500">Pending Payments</p>
-                            <p id="pendingPayments" class="text-2xl font-bold text-orange-600 mt-1">₹0</p>
+                            <p id="pendingPayments" class="text-2xl font-bold text-green-600 mt-1">₹0</p>
                         </div>
-                        <div class="h-12 w-12 rounded-full bg-orange-100 flex items-center justify-center">
-                            <i class="fa-solid fa-clock text-orange-600 text-xl"></i>
+                        <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                            <i class="fa-solid fa-clock text-green-600 text-xl"></i>
                         </div>
                     </div>
                 </div>
@@ -181,28 +174,8 @@
             <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 mb-6">
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
-                        <select id="departmentFilter" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition bg-white" onchange="filterWorkers()">
-                            <option value="">All Departments</option>
-                            <option value="Sales">Sales</option>
-                            <option value="Warehouse">Warehouse</option>
-                            <option value="Delivery">Delivery</option>
-                            <option value="Accounting">Accounting</option>
-                            <option value="Management">Management</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-                        <select id="statusFilter" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition bg-white" onchange="filterWorkers()">
-                            <option value="">All Status</option>
-                            <option value="active">Active</option>
-                            <option value="inactive">Inactive</option>
-                            <option value="on_leave">On Leave</option>
-                        </select>
-                    </div>
-                    <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
-                        <select id="sortBy" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition bg-white" onchange="filterWorkers()">
+                        <select id="sortBy" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition bg-white" onchange="filterWorkers()">
                             <option value="newest">Newest First</option>
                             <option value="oldest">Oldest First</option>
                             <option value="name">Name (A-Z)</option>
@@ -226,8 +199,6 @@
                             <tr class="bg-gray-50 border-b border-gray-200">
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Worker</th>
                                 <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Contact</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Department</th>
-                                <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Position</th>
                                 <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Salary</th>
                                 <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
                                 <th class="px-6 py-4 text-center text-xs font-semibold text-gray-500 uppercase tracking-wider">Actions</th>
@@ -264,51 +235,29 @@
                 <!-- Personal Information -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="workerName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition" placeholder="Enter full name" required>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Full Name <span class="text-green-600">*</span></label>
+                        <input type="text" id="workerName" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition" placeholder="Enter full name" required>
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number <span class="text-red-500">*</span></label>
-                        <input type="tel" id="workerPhone" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition" placeholder="Enter phone number" required>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number <span class="text-green-600">*</span></label>
+                        <input type="tel" id="workerPhone" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition" placeholder="Enter phone number" required>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Email <span class="text-gray-400 font-normal">(Optional)</span></label>
-                        <input type="email" id="workerEmail" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition" placeholder="Enter email address">
+                        <input type="email" id="workerEmail" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition" placeholder="Enter email address">
                     </div>
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Date of Joining <span class="text-red-500">*</span></label>
-                        <input type="date" id="workerJoinDate" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition" required>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Date of Joining <span class="text-green-600">*</span></label>
+                        <input type="date" id="workerJoinDate" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition" required>
                     </div>
                 </div>
 
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Address</label>
-                    <textarea id="workerAddress" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition resize-none" placeholder="Enter address"></textarea>
-                </div>
-
-                <!-- Employment Information -->
-                <div class="border-t border-gray-200 pt-5">
-                    <h4 class="text-sm font-semibold text-gray-700 mb-4">Employment Details</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Department <span class="text-red-500">*</span></label>
-                            <select id="workerDepartment" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition bg-white" required>
-                                <option value="">Select Department</option>
-                                <option value="Sales">Sales</option>
-                                <option value="Warehouse">Warehouse</option>
-                                <option value="Delivery">Delivery</option>
-                                <option value="Accounting">Accounting</option>
-                                <option value="Management">Management</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Position <span class="text-red-500">*</span></label>
-                            <input type="text" id="workerPosition" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition" placeholder="Enter position/role" required>
-                        </div>
-                    </div>
+                    <textarea id="workerAddress" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition resize-none" placeholder="Enter address"></textarea>
                 </div>
 
                 <!-- Salary Information -->
@@ -316,16 +265,16 @@
                     <h4 class="text-sm font-semibold text-gray-700 mb-4">Salary Details</h4>
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Basic Salary (₹) <span class="text-red-500">*</span></label>
-                            <input type="number" id="workerSalary" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition" placeholder="Enter salary" min="0" step="100" required>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Basic Salary (₹) <span class="text-green-600">*</span></label>
+                            <input type="number" id="workerSalary" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition" placeholder="Enter salary" min="0" step="100" required>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Allowances (₹)</label>
-                            <input type="number" id="workerAllowance" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition" placeholder="Enter allowances" min="0" step="100" value="0">
+                            <input type="number" id="workerAllowance" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition" placeholder="Enter allowances" min="0" step="100" value="0">
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-2">Payment Cycle</label>
-                            <select id="workerPaymentCycle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition bg-white">
+                            <select id="workerPaymentCycle" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition bg-white">
                                 <option value="monthly">Monthly</option>
                                 <option value="weekly">Weekly</option>
                                 <option value="daily">Daily</option>
@@ -339,15 +288,15 @@
                     <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
                     <div class="flex gap-4">
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="workerStatus" value="active" checked class="w-4 h-4 text-red-600 focus:ring-red-500">
+                            <input type="radio" name="workerStatus" value="active" checked class="w-4 h-4 text-green-600 focus:ring-green-500">
                             <span class="text-sm text-gray-700">Active</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="workerStatus" value="inactive" class="w-4 h-4 text-red-600 focus:ring-red-500">
+                            <input type="radio" name="workerStatus" value="inactive" class="w-4 h-4 text-green-600 focus:ring-green-500">
                             <span class="text-sm text-gray-700">Inactive</span>
                         </label>
                         <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="radio" name="workerStatus" value="on_leave" class="w-4 h-4 text-red-600 focus:ring-red-500">
+                            <input type="radio" name="workerStatus" value="on_leave" class="w-4 h-4 text-green-600 focus:ring-green-500">
                             <span class="text-sm text-gray-700">On Leave</span>
                         </label>
                     </div>
@@ -357,7 +306,7 @@
                 <button onclick="closeWorkerModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition">
                     Cancel
                 </button>
-                <button onclick="saveWorker()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-lg transition">
+                <button onclick="saveWorker()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg transition">
                     <i class="fa-solid fa-check mr-2"></i> <span id="saveButtonText">Add Worker</span>
                 </button>
             </div>
@@ -368,8 +317,8 @@
     <div id="deleteModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
         <div class="bg-white rounded-xl shadow-lg max-w-md w-full mx-4 p-6">
             <div class="text-center">
-                <div class="h-16 w-16 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-4">
-                    <i class="fa-solid fa-user-xmark text-red-600 text-2xl"></i>
+                <div class="h-16 w-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+                    <i class="fa-solid fa-user-xmark text-green-600 text-2xl"></i>
                 </div>
                 <h3 class="text-xl font-bold text-gray-800 mb-2">Remove Worker</h3>
                 <p class="text-gray-500 mb-6">Are you sure you want to remove "<span id="deleteWorkerName" class="font-medium text-gray-700"></span>"? This action cannot be undone.</p>
@@ -377,7 +326,7 @@
                     <button onclick="closeDeleteModal()" class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition">
                         Cancel
                     </button>
-                    <button onclick="confirmDelete()" class="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold py-2.5 rounded-lg transition">
+                    <button onclick="confirmDelete()" class="flex-1 bg-green-600 hover:bg-green-700 text-white font-semibold py-2.5 rounded-lg transition">
                         Remove
                     </button>
                 </div>
@@ -412,15 +361,15 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Payment Amount (₹)</label>
-                    <input type="number" id="payAmount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition" min="0" step="100">
+                    <input type="number" id="payAmount" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition" min="0" step="100">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Payment Date</label>
-                    <input type="date" id="payDate" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition">
+                    <input type="date" id="payDate" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition">
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Payment Method</label>
-                    <select id="payMethod" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition bg-white">
+                    <select id="payMethod" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition bg-white">
                         <option value="cash">Cash</option>
                         <option value="bank_transfer">Bank Transfer</option>
                         <option value="upi">UPI</option>
@@ -429,7 +378,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">Notes (Optional)</label>
-                    <textarea id="payNotes" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-transparent transition resize-none" placeholder="Add any notes..."></textarea>
+                    <textarea id="payNotes" rows="2" class="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition resize-none" placeholder="Add any notes..."></textarea>
                 </div>
             </div>
             <div class="flex gap-4 mt-6">
@@ -453,7 +402,6 @@
                 </button>
             </div>
             <div id="viewWorkerContent" class="p-6">
-                <!-- Content populated by JS -->
             </div>
             <div class="p-6 border-t border-gray-200">
                 <button onclick="closeViewModal()" class="w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2.5 rounded-lg transition">
@@ -463,12 +411,12 @@
         </div>
     </div>
 
+    <script src="/assets/Js/components/sidebar.js"></script>
+    <script src="/assets/Js/workers.js"></script>
     <script>
-    </script>
-    <script src="../assets/Js/components/sidebar.js"></script>
-    <script src="../assets/Js/workers.js"></script>
-    <script>
-        initSidebar('workers');
+        document.addEventListener('DOMContentLoaded', function() {
+            initSidebar('workers');
+        });
     </script>
 </body>
 </html>

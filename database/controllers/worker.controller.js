@@ -4,16 +4,16 @@ import { supabase } from '../config/Supabase.js';
 export const addWorker = async (req, res) => {
     try {
         const tenantId = req.tenant_id;
-        const { name, phone, email, join_date, address, department, position, salary, allowance, payment_cycle, status } = req.body;
+        const { name, phone, email, join_date, address, salary, allowance, payment_cycle } = req.body;
 
-        console.log('📝 Adding worker:', { name, department, position, salary, tenantId });
+        console.log('📝 Adding worker:', { name, salary, tenantId });   
 
         if (!tenantId) {
             return res.status(401).json({ error: 'Unauthorized: tenant_id missing' });
         }
 
         // Basic validation
-        if (!name || !phone || !join_date || !department || !position || !salary) {
+        if (!name || !phone || !join_date || !salary) {
             return res.status(400).json({ error: 'Required fields are missing' });
         }
 
@@ -24,12 +24,9 @@ export const addWorker = async (req, res) => {
             email: email || null,
             join_date,
             address: address || null,
-            department,
-            position,
             salary: parseFloat(salary),
             allowance: parseFloat(allowance) || 0,
             payment_cycle: payment_cycle || 'monthly',
-            status: status || 'active',
             created_at: new Date().toISOString()
         };
 
@@ -125,7 +122,7 @@ export const updateWorker = async (req, res) => {
     try {
         const tenantId = req.tenant_id;
         const { id } = req.params;
-        const { name, phone, email, join_date, address, department, position, salary, allowance, payment_cycle, status } = req.body;
+        const { name, phone, email, join_date, address, salary, allowance, payment_cycle } = req.body;
 
         if (!tenantId) {
             return res.status(401).json({ error: 'Unauthorized: tenant_id missing' });
@@ -149,12 +146,9 @@ export const updateWorker = async (req, res) => {
             email: email || null,
             join_date,
             address: address || null,
-            department,
-            position,
             salary: parseFloat(salary),
             allowance: parseFloat(allowance) || 0,
             payment_cycle: payment_cycle || 'monthly',
-            status: status || 'active',
             updated_at: new Date().toISOString()
         };
 

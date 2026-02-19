@@ -160,7 +160,7 @@ function renderSalesTable() {
             <td class="px-6 py-4 text-center text-gray-700">${bill.billDate}</td>
             <td class="px-6 py-4 text-right font-semibold text-gray-800">${formatCurrency(bill.totalAmount)}</td>
             <td class="px-6 py-4 text-right text-green-600">${formatCurrency(bill.paidAmount)}</td>
-            <td class="px-6 py-4 text-right font-semibold ${bill.remainingBalance > 0 ? 'text-orange-600' : 'text-green-600'}">
+            <td class="px-6 py-4 text-right font-semibold ${bill.remainingBalance > 0 ? 'text-green-600' : 'text-green-700'}">
                 ${formatCurrency(bill.remainingBalance)}
             </td>
         </tr>
@@ -198,12 +198,12 @@ function renderStockTable() {
     const sortedCategories = Object.entries(categoryData).sort((a, b) => b[1].value - a[1].value);
     
     const colors = [
-        'bg-red-100 text-red-800',
-        'bg-blue-100 text-blue-800',
+        'bg-green-50 text-green-700',
         'bg-green-100 text-green-800',
-        'bg-purple-100 text-purple-800',
-        'bg-orange-100 text-orange-800',
-        'bg-yellow-100 text-yellow-800'
+        'bg-green-200 text-green-800',
+        'bg-green-50 text-green-600',
+        'bg-green-100 text-green-700',
+        'bg-green-200 text-green-700'
     ];
     
     tbody.innerHTML = sortedCategories.map(([name, data], index) => {
@@ -221,7 +221,7 @@ function renderStockTable() {
                 <td class="px-6 py-4">
                     <div class="flex items-center justify-center gap-2">
                         <div class="w-24 bg-gray-200 rounded-full h-2">
-                            <div class="bg-red-500 h-2 rounded-full" style="width: ${percentage}%"></div>
+                            <div class="bg-green-500 h-2 rounded-full" style="width: ${percentage}%"></div>
                         </div>
                         <span class="text-sm font-medium text-gray-600 w-12">${percentage}%</span>
                     </div>
@@ -267,8 +267,8 @@ function renderSalesDateChart() {
     
     // Create gradient
     let gradient = ctx.createLinearGradient(0, 0, 0, 200);
-    gradient.addColorStop(0, 'rgba(229, 57, 53, 0.3)');
-    gradient.addColorStop(1, 'rgba(229, 57, 53, 0.0)');
+    gradient.addColorStop(0, 'rgba(22, 163, 74, 0.3)');
+    gradient.addColorStop(1, 'rgba(22, 163, 74, 0.0)');
     
     salesChart = new Chart(ctx, {
         type: 'line',
@@ -278,7 +278,7 @@ function renderSalesDateChart() {
                 {
                     label: 'Sales',
                     data: sortedDates.map(d => dateData[d].sales),
-                    borderColor: '#E53935',
+                    borderColor: '#16a34a',
                     backgroundColor: gradient,
                     borderWidth: 2,
                     fill: true,
@@ -349,7 +349,7 @@ function renderSalesChart() {
         .sort((a, b) => b[1] - a[1])
         .slice(0, 6);
     
-    const colors = ['#EF4444', '#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EC4899'];
+    const colors = ['#16a34a', '#22c55e', '#4ade80', '#86efac', '#15803d', '#166534'];
     
     categoryChart = new Chart(ctx, {
         type: 'doughnut',
@@ -410,7 +410,7 @@ function renderCategoryChart() {
         .sort((a, b) => b[1] - a[1])
         .slice(0, 6);
     
-    const colors = ['#EF4444', '#3B82F6', '#10B981', '#8B5CF6', '#F59E0B', '#EC4899'];
+    const colors = ['#16A34A', '#22C55E', '#4ADE80', '#15803D', '#86EFAC', '#14532D'];
     
     categoryChart = new Chart(ctx, {
         type: 'doughnut',

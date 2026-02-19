@@ -9,7 +9,6 @@ let editingWorkerId = null;
 document.addEventListener('DOMContentLoaded', function() {
     checkAuth();
     fetchWorkers();
-    loadUserInfo();
     setDefaultDate();
 });
 
@@ -23,13 +22,7 @@ function checkAuth() {
     return true;
 }
 
-// Load user info
-function loadUserInfo() {
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    const userName = user.name || user.email || 'User';
-    document.getElementById('userName').textContent = userName;
-    document.getElementById('userInitial').textContent = userName.charAt(0).toUpperCase();
-}
+// User info is now loaded centrally by sidebar.js loadHeaderUser()
 
 // Set default date for join date
 function setDefaultDate() {
@@ -80,8 +73,6 @@ async function fetchWorkers() {
 // Filter and sort workers
 function filterWorkers() {
     const searchTerm = document.getElementById('searchInput').value.toLowerCase();
-    const departmentFilter = document.getElementById('departmentFilter').value;
-    const statusFilter = document.getElementById('statusFilter').value;
     const sortBy = document.getElementById('sortBy').value;
 
     filteredWorkers = [...allWorkers];
@@ -92,20 +83,6 @@ function filterWorkers() {
             worker.name.toLowerCase().includes(searchTerm) ||
             worker.phone?.toLowerCase().includes(searchTerm) ||
             worker.position?.toLowerCase().includes(searchTerm)
-        );
-    }
-
-    // Apply department filter
-    if (departmentFilter) {
-        filteredWorkers = filteredWorkers.filter(worker => 
-            worker.department === departmentFilter
-        );
-    }
-
-    // Apply status filter
-    if (statusFilter) {
-        filteredWorkers = filteredWorkers.filter(worker => 
-            worker.status === statusFilter
         );
     }
 
@@ -141,21 +118,6 @@ function renderWorkers() {
 
     tbody.innerHTML = filteredWorkers.map(worker => {
         const totalSalary = (worker.salary || 0) + (worker.allowance || 0);
-        
-        let statusBadge = '';
-        switch (worker.status) {
-            case 'active':
-                statusBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">Active</span>';
-                break;
-            case 'inactive':
-                statusBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">Inactive</span>';
-                break;
-            case 'on_leave':
-                statusBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-yellow-100 text-yellow-800">On Leave</span>';
-                break;
-            default:
-                statusBadge = '<span class="px-3 py-1 rounded-full text-xs font-semibold bg-gray-100 text-gray-800">Unknown</span>';
-        }
 
         const initials = worker.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
 
@@ -163,7 +125,7 @@ function renderWorkers() {
             <tr class="hover:bg-gray-50 transition">
                 <td class="px-6 py-4">
                     <div class="flex items-center gap-3">
-                        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white font-bold text-sm">
+                        <div class="h-10 w-10 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold text-sm">
                             ${initials}
                         </div>
                         <div>
@@ -176,27 +138,23 @@ function renderWorkers() {
                     <p class="text-gray-800">${escapeHtml(worker.phone || 'N/A')}</p>
                     <p class="text-xs text-gray-400">${escapeHtml(worker.email || 'No email')}</p>
                 </td>
-                <td class="px-6 py-4">
-                    <span class="px-3 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">${escapeHtml(worker.department || 'N/A')}</span>
-                </td>
                 <td class="px-6 py-4 text-gray-700">${escapeHtml(worker.position || 'N/A')}</td>
                 <td class="px-6 py-4 text-right">
                     <p class="font-bold text-gray-800">₹${totalSalary.toLocaleString('en-IN')}</p>
                     <p class="text-xs text-gray-400">${worker.payment_cycle || 'monthly'}</p>
                 </td>
-                <td class="px-6 py-4 text-center">${statusBadge}</td>
                 <td class="px-6 py-4 text-center">
                     <div class="flex items-center justify-center gap-1">
                         <button onclick="viewWorker('${worker.id}')" class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition" title="View Details">
                             <i class="fa-solid fa-eye"></i>
                         </button>
-                        <button onclick="editWorker('${worker.id}')" class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition" title="Edit">
+                        <button onclick="editWorker('${worker.id}')" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition" title="Edit">
                             <i class="fa-solid fa-pen-to-square"></i>
                         </button>
                         <button onclick="openPayModal('${worker.id}')" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition" title="Pay Salary">
                             <i class="fa-solid fa-indian-rupee-sign"></i>
                         </button>
-                        <button onclick="deleteWorker('${worker.id}', '${escapeHtml(worker.name)}')" class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition" title="Remove">
+                        <button onclick="deleteWorker('${worker.id}', '${escapeHtml(worker.name)}')" class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition" title="Remove">
                             <i class="fa-solid fa-trash-can"></i>
                         </button>
                     </div>
@@ -216,7 +174,7 @@ function showEmptyState() {
                     <i class="fa-solid fa-users-slash text-gray-300 text-5xl mb-4"></i>
                     <p class="text-gray-500 font-medium">No workers found</p>
                     <p class="text-gray-400 text-sm mt-1">Add your first worker to get started</p>
-                    <button onclick="openAddWorkerModal()" class="mt-4 inline-flex items-center gap-2 bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition">
+                    <button onclick="openAddWorkerModal()" class="mt-4 inline-flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-2 px-4 rounded-lg transition">
                         <i class="fa-solid fa-user-plus"></i> Add Worker
                     </button>
                 </div>
@@ -228,13 +186,10 @@ function showEmptyState() {
 // Update statistics
 function updateStats() {
     const totalWorkersCount = allWorkers.length;
-    const activeWorkersCount = allWorkers.filter(w => w.status === 'active').length;
     const totalMonthlySalary = allWorkers
-        .filter(w => w.status === 'active')
         .reduce((sum, w) => sum + (w.salary || 0) + (w.allowance || 0), 0);
 
     document.getElementById('totalWorkers').textContent = totalWorkersCount;
-    document.getElementById('activeWorkers').textContent = activeWorkersCount;
     document.getElementById('totalSalary').textContent = `₹${totalMonthlySalary.toLocaleString('en-IN')}`;
     document.getElementById('pendingPayments').textContent = `₹0`; // Can be calculated from payment history
 }
@@ -251,8 +206,6 @@ function handleSearch() {
 // Reset filters
 function resetFilters() {
     document.getElementById('searchInput').value = '';
-    document.getElementById('departmentFilter').value = '';
-    document.getElementById('statusFilter').value = '';
     document.getElementById('sortBy').value = 'newest';
     filterWorkers();
 }
@@ -264,7 +217,6 @@ function openAddWorkerModal() {
     document.getElementById('saveButtonText').textContent = 'Add Worker';
     document.getElementById('workerForm').reset();
     setDefaultDate();
-    document.querySelector('input[name="workerStatus"][value="active"]').checked = true;
     document.getElementById('workerModal').classList.remove('hidden');
 }
 
@@ -293,14 +245,11 @@ function editWorker(workerId) {
     document.getElementById('workerEmail').value = worker.email || '';
     document.getElementById('workerJoinDate').value = worker.join_date || '';
     document.getElementById('workerAddress').value = worker.address || '';
-    document.getElementById('workerDepartment').value = worker.department || '';
-    document.getElementById('workerPosition').value = worker.position || '';
+    const positionField = document.getElementById('workerPosition');
+    if (positionField) positionField.value = worker.position || '';
     document.getElementById('workerSalary').value = worker.salary || '';
     document.getElementById('workerAllowance').value = worker.allowance || 0;
     document.getElementById('workerPaymentCycle').value = worker.payment_cycle || 'monthly';
-    
-    const statusRadio = document.querySelector(`input[name="workerStatus"][value="${worker.status || 'active'}"]`);
-    if (statusRadio) statusRadio.checked = true;
 
     document.getElementById('workerModal').classList.remove('hidden');
 }
@@ -312,14 +261,13 @@ async function saveWorker() {
     const email = document.getElementById('workerEmail').value.trim();
     const joinDate = document.getElementById('workerJoinDate').value;
     const address = document.getElementById('workerAddress').value.trim();
-    const department = document.getElementById('workerDepartment').value;
-    const position = document.getElementById('workerPosition').value.trim();
+    const positionField = document.getElementById('workerPosition');
+    const position = positionField ? positionField.value.trim() : '';
     const salary = parseFloat(document.getElementById('workerSalary').value) || 0;
     const allowance = parseFloat(document.getElementById('workerAllowance').value) || 0;
     const paymentCycle = document.getElementById('workerPaymentCycle').value;
-    const status = document.querySelector('input[name="workerStatus"]:checked').value;
 
-    if (!name || !phone || !joinDate || !department || !position || salary <= 0) {
+    if (!name || !phone || !joinDate || salary <= 0) {
         showError('Please fill in all required fields');
         return;
     }
@@ -330,13 +278,14 @@ async function saveWorker() {
         email,
         join_date: joinDate,
         address,
-        department,
-        position,
         salary,
         allowance,
-        payment_cycle: paymentCycle,
-        status
+        payment_cycle: paymentCycle
     };
+    
+    if (position) {
+        workerData.position = position;
+    }
 
     try {
         const token = localStorage.getItem('token');
@@ -377,31 +326,17 @@ function viewWorker(workerId) {
     }
 
     const totalSalary = (worker.salary || 0) + (worker.allowance || 0);
-    
-    let statusBadge = '';
-    switch (worker.status) {
-        case 'active':
-            statusBadge = '<span class="px-3 py-1 rounded-full text-sm font-semibold bg-green-100 text-green-800">Active</span>';
-            break;
-        case 'inactive':
-            statusBadge = '<span class="px-3 py-1 rounded-full text-sm font-semibold bg-gray-100 text-gray-800">Inactive</span>';
-            break;
-        case 'on_leave':
-            statusBadge = '<span class="px-3 py-1 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800">On Leave</span>';
-            break;
-    }
 
     const initials = worker.name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
 
     document.getElementById('viewWorkerContent').innerHTML = `
         <div class="flex items-center gap-4 mb-6">
-            <div class="h-20 w-20 rounded-full bg-gradient-to-br from-red-400 to-red-600 flex items-center justify-center text-white font-bold text-2xl">
+            <div class="h-20 w-20 rounded-full bg-gradient-to-br from-green-500 to-green-700 flex items-center justify-center text-white font-bold text-2xl">
                 ${initials}
             </div>
             <div>
                 <h4 class="text-2xl font-bold text-gray-800">${escapeHtml(worker.name)}</h4>
-                <p class="text-gray-500">${escapeHtml(worker.position || 'N/A')} • ${escapeHtml(worker.department || 'N/A')}</p>
-                <div class="mt-2">${statusBadge}</div>
+                <p class="text-gray-500">${escapeHtml(worker.position || 'N/A')}</p>
             </div>
         </div>
 
@@ -430,10 +365,6 @@ function viewWorker(workerId) {
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-calendar text-gray-400 w-5"></i>
                         <span class="text-gray-800">Joined: ${formatDate(worker.join_date)}</span>
-                    </div>
-                    <div class="flex items-center gap-3">
-                        <i class="fa-solid fa-building text-gray-400 w-5"></i>
-                        <span class="text-gray-800">${escapeHtml(worker.department || 'N/A')}</span>
                     </div>
                     <div class="flex items-center gap-3">
                         <i class="fa-solid fa-briefcase text-gray-400 w-5"></i>
